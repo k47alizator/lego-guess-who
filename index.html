@@ -13,7 +13,6 @@
         .big-btn { width: 260px; padding: 18px; margin: 10px; font-size: 18px; border-radius: 12px; border: none; color: white; cursor: pointer; font-weight: bold; box-shadow: 0 5px 0 #000; transition: 0.1s; }
         .btn-blue { background: var(--lego-blue); }
         .btn-green { background: #28a745; }
-        .big-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #000; }
         .board { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 20px; }
         .card { background: #fff; border: 3px solid #ddd; border-radius: 10px; padding: 8px; cursor: pointer; position: relative; transition: 0.2s; display: flex; flex-direction: column; align-items: center; }
         .card img { width: 100%; height: 110px; object-fit: contain; pointer-events: none; }
@@ -35,35 +34,32 @@
     </div>
 
     <div id="s-join" class="hidden">
-        <h3>Wpisz 4-cyfrowy kod od kolegi:</h3>
+        <h3>Wpisz 4-cyfrowy kod:</h3>
         <input type="text" id="join-id" maxlength="4" placeholder="0000"><br><br>
-        <button class="big-btn btn-green" onclick="doJoin()">POŁĄCZ TERAZ</button>
-        <p onclick="showS('s-start')" style="cursor:pointer; color:grey; text-decoration:underline;">Wróć do menu</p>
+        <button class="big-btn btn-green" onclick="doJoin()">POŁĄCZ</button>
+        <p onclick="showS('s-start')" style="cursor:pointer; color:grey;">Powrót</p>
     </div>
 
     <div id="s-lobby" class="hidden">
-        <p style="font-size: 18px;">TWÓJ KOD POKOJU:</p>
-        <h2 id="my-id" style="font-size:50px; color:var(--lego-blue); margin:10px; letter-spacing: 5px;">----</h2>
-        <p>Gdy kolega dołączy, wybierz kategorię:</p>
+        <p>KOD POKOJU:</p>
+        <h2 id="my-id" style="font-size:50px; color:var(--lego-blue); margin:10px;">----</h2>
         <div id="cat-list" style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;"></div>
     </div>
 
     <div id="s-game" class="hidden">
         <div class="game-header">
             <div>TWOJA POSTAĆ:<br><strong id="my-char-name" style="font-size:20px; color:var(--lego-red);">?</strong></div>
-            <button onclick="location.reload()" style="background:#444; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Wyjdź z gry</button>
+            <button onclick="location.reload()" style="background:#444; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Wyjdź</button>
         </div>
         <div id="game-board" class="board"></div>
     </div>
 </div>
 
 <script>
-    // --- KONFIGURACJA TWOJEGO KONTA ---
     const GITHUB_USER = "k47alizator"; 
     const REPO_NAME = "lego-guess-who"; 
     const IMG_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/img/`;
 
-    // BAZA DANYCH (min. 24 postacie na kategorię)
     const db = {
         "STAR WARS": [
             {n:"Darth Vader", img:"vader.jpg"}, {n:"Yoda", img:"yoda.jpg"}, {n:"Luke", img:"luke.jpg"},
@@ -80,10 +76,30 @@
             {n:"Harley Quinn", img:"harley.jpg"}, {n:"Bane", img:"bane.jpg"}, {n:"Batgirl", img:"batgirl.jpg"},
             {n:"Two-Face", img:"twoface.jpg"}, {n:"Penguin", img:"penguin.jpg"}, {n:"Riddler", img:"riddler.jpg"},
             {n:"Catwoman", img:"catwoman.jpg"}, {n:"Poison Ivy", img:"ivy.jpg"}, {n:"Scarecrow", img:"scarecrow.jpg"},
-            {n:"Nightwing", img:"nightwing.jpg"}, {n:"Alfred", img:"alfred.jpg"}, {n:"Commissioner Gordon", img:"gordon.jpg"},
+            {n:"Nightwing", img:"nightwing.jpg"}, {n:"Alfred", img:"alfred.jpg"}, {n:"Gordon", img:"gordon.jpg"},
             {n:"Ra's al Ghul", img:"ras.jpg"}, {n:"Killer Croc", img:"croc.jpg"}, {n:"Mr. Freeze", img:"freeze.jpg"},
             {n:"Batwoman", img:"batwoman.jpg"}, {n:"Red Hood", img:"redhood.jpg"}, {n:"Zatanna", img:"zatanna.jpg"},
             {n:"Clayface", img:"clayface.jpg"}, {n:"Hush", img:"hush.jpg"}, {n:"Bat-Mite", img:"batmite.jpg"}
+        ],
+        "MARVEL": [
+            {n:"Iron Man", img:"ironman.jpg"}, {n:"Spider-Man", img:"spiderman.jpg"}, {n:"Captain America", img:"cap.jpg"},
+            {n:"Thor", img:"thor.jpg"}, {n:"Hulk", img:"hulk.jpg"}, {n:"Black Widow", img:"widow.jpg"},
+            {n:"Thanos", img:"thanos.jpg"}, {n:"Black Panther", img:"panther.jpg"}, {n:"Doctor Strange", img:"strange.jpg"},
+            {n:"Star-Lord", img:"starlord.jpg"}, {n:"Groot", img:"groot.jpg"}, {n:"Rocket", img:"rocket.jpg"},
+            {n:"Ant-Man", img:"antman.jpg"}, {n:"Wolverine", img:"wolvie.jpg"}, {n:"Deadpool", img:"deadpool.jpg"},
+            {n:"Venom", img:"venom.jpg"}, {n:"Loki", img:"loki.jpg"}, {n:"Daredevil", img:"daredevil.jpg"},
+            {n:"Carnage", img:"carnage.jpg"}, {n:"Magneto", img:"magneto.jpg"}, {n:"Mystique", img:"mystique.jpg"},
+            {n:"Storm", img:"storm-m.jpg"}, {n:"Cyclops", img:"cyclops.jpg"}, {n:"Ghost Rider", img:"ghost.jpg"}
+        ],
+        "HARRY POTTER": [
+            {n:"Harry Potter", img:"harry.jpg"}, {n:"Ron Weasley", img:"ron.jpg"}, {n:"Hermiona", img:"hermiona.jpg"},
+            {n:"Dumbledore", img:"dumbledore.jpg"}, {n:"Voldemort", img:"voldemort.jpg"}, {n:"Snape", img:"snape.jpg"},
+            {n:"Hagrid", img:"hagrid.jpg"}, {n:"Draco Malfoy", img:"draco.jpg"}, {n:"Dobby", img:"dobby.jpg"},
+            {n:"Bellatrix", img:"bellatrix.jpg"}, {n:"Sirius Black", img:"sirius.jpg"}, {n:"Luna Lovegood", img:"luna.jpg"},
+            {n:"Neville", img:"neville.jpg"}, {n:"Ginny Weasley", img:"ginny.jpg"}, {n:"Fred Weasley", img:"fred.jpg"},
+            {n:"George Weasley", img:"george.jpg"}, {n:"Remus Lupin", img:"lupin.jpg"}, {n:"Mad-Eye", img:"madeye.jpg"},
+            {n:"McGonagall", img:"mcgonagall.jpg"}, {n:"Cedric Diggory", img:"cedric.jpg"}, {n:"Gilderoy", img:"gilderoy.jpg"},
+            {n:"Filch", img:"filch.jpg"}, {n:"Newt Scamander", img:"newt.jpg"}, {n:"Grindelwald", img:"grindelwald.jpg"}
         ]
     };
 
@@ -107,38 +123,20 @@
         showS('s-lobby');
         shortId = Math.floor(1000 + Math.random() * 9000).toString();
         peer = new Peer(shortId);
-        
-        peer.on('open', () => {
-            document.getElementById('my-id').innerText = shortId;
-        });
-
-        peer.on('connection', c => { 
-            conn = c; 
-            alert("GRACZ DOŁĄCZYŁ!");
-            setupConn();
-        });
-
-        peer.on('error', err => {
-            if(err.type === 'unavailable-id') goHost();
-        });
+        peer.on('open', () => { document.getElementById('my-id').innerText = shortId; });
+        peer.on('connection', c => { conn = c; alert("GRACZ DOŁĄCZYŁ!"); setupConn(); });
+        peer.on('error', err => { if(err.type === 'unavailable-id') goHost(); });
     }
 
     function doJoin() {
         const id = document.getElementById('join-id').value;
         peer = new Peer();
-        peer.on('open', () => {
-            conn = peer.connect(id);
-            setupConn();
-        });
+        peer.on('open', () => { conn = peer.connect(id); setupConn(); });
     }
 
     function setupConn() {
         conn.on('data', data => {
-            if(data.type === 'START') {
-                boardData = data.pool;
-                myChar = data.yourChar;
-                renderGame();
-            }
+            if(data.type === 'START') { boardData = data.pool; myChar = data.yourChar; renderGame(); }
             if(data.type === 'GUESS') {
                 if(confirm("Przeciwnik pyta czy masz: " + data.name + "?")) {
                     if(data.name === myChar.n) alert("PRZECIWNIK WYGRAŁ!");
@@ -152,14 +150,10 @@
         if(!conn) return alert("Czekaj na kolegę!");
         let pool = db[cat];
         let shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, 24);
-        
         const charForHost = shuffled[Math.floor(Math.random()*24)];
         const charForGuest = shuffled[Math.floor(Math.random()*24)];
-
         conn.send({ type: 'START', pool: shuffled, yourChar: charForHost });
-        boardData = shuffled;
-        myChar = charForGuest;
-        renderGame();
+        boardData = shuffled; myChar = charForGuest; renderGame();
     }
 
     function renderGame() {
@@ -167,15 +161,10 @@
         document.getElementById('my-char-name').innerText = myChar.n;
         const b = document.getElementById('game-board');
         b.innerHTML = '';
-
         boardData.forEach(p => {
             const card = document.createElement('div');
             card.className = 'card';
-            card.innerHTML = `
-                <img src="${IMG_BASE + p.img}" onerror="this.src='https://via.placeholder.com/150/ffd500/000000?text=LEGO'">
-                <p>${p.n}</p>
-                <button class="guess-btn" onclick="makeGuess('${p.n}', event)">ZGADUJ!</button>
-            `;
+            card.innerHTML = `<img src="${IMG_BASE + p.img}" onerror="this.src='https://via.placeholder.com/150/ffd500/000000?text=LEGO'"><p>${p.n}</p><button class="guess-btn" onclick="makeGuess('${p.n}', event)">ZGADUJ!</button>`;
             card.onclick = () => card.classList.toggle('eliminated');
             b.appendChild(card);
         });
@@ -183,7 +172,7 @@
 
     function makeGuess(name, event) {
         event.stopPropagation();
-        if(confirm("Czy chcesz zapytać czy przeciwnik to: " + name + "?")) {
+        if(confirm("Zapytać czy przeciwnik to: " + name + "?")) {
             conn.send({type: 'GUESS', name: name});
             alert("Wysłano pytanie!");
         }
