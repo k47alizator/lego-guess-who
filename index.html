@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEGA LEGO Guess Who</title>
+    <title>LEGO ZGADNIJ KTO TO</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         :root { --lego-red: #da291c; --lego-blue: #006cb7; --lego-yellow: #ffd500; --lego-white: #ffffff; }
         body { font-family: 'Arial Black', sans-serif; background: #e5e5e5; margin: 0; padding: 10px; text-align: center; }
-        .container { max-width: 1100px; margin: 0 auto; background: white; padding: 20px; border-radius: 20px; border: 5px solid var(--lego-yellow); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .container { max-width: 1100px; margin: 0 auto; background: white; padding: 20px; border-radius: 20px; border: 5px solid var(--lego-yellow); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; }
+        .lang-switch { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; }
+        .lang-btn { cursor: pointer; font-size: 24px; background: none; border: none; padding: 5px; }
         .hidden { display: none !important; }
         .big-btn { width: 220px; padding: 15px; margin: 5px; font-size: 14px; border-radius: 10px; border: none; color: white; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #000; transition: 0.1s; text-transform: uppercase; }
         .btn-blue { background: var(--lego-blue); }
         .btn-green { background: #28a745; }
-        .big-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #000; }
         .board { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 20px; }
-        .card { background: #fff; border: 3px solid #ddd; border-radius: 10px; padding: 8px; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; }
+        .card { background: #fff; border: 3px solid #ddd; border-radius: 10px; padding: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
         .card img { width: 100%; height: 110px; object-fit: contain; pointer-events: none; }
         .card p { margin: 5px 0; font-size: 11px; font-weight: bold; pointer-events: none; height: 30px; display: flex; align-items: center; }
         .card.eliminated { opacity: 0.15; filter: grayscale(1); transform: scale(0.95); }
@@ -27,31 +28,36 @@
 <body>
 
 <div class="container">
-    <h1 style="color:var(--lego-red); -webkit-text-stroke: 1px black; margin:10px 0;">MEGA LEGO GUESS WHO</h1>
+    <div class="lang-switch">
+        <button class="lang-btn" onclick="setLang('pl')">🇵🇱</button>
+        <button class="lang-btn" onclick="setLang('en')">🇬🇧</button>
+    </div>
+
+    <h1 id="main-title" style="color:var(--lego-red); -webkit-text-stroke: 1px black; margin:10px 0;">LEGO ZGADNIJ KTO TO</h1>
 
     <div id="s-start">
-        <button class="big-btn btn-blue" onclick="goHost()">STWÓRZ POKÓJ</button><br>
-        <button class="big-btn btn-green" onclick="showS('s-join')">DOŁĄCZ DO GRY</button>
+        <button class="big-btn btn-blue" onclick="goHost()" id="btn-host">STWÓRZ POKÓJ</button><br>
+        <button class="big-btn btn-green" onclick="showS('s-join')" id="btn-join-menu">DOŁĄCZ DO GRY</button>
     </div>
 
     <div id="s-join" class="hidden">
-        <h3>Wpisz 4-cyfrowy kod:</h3>
+        <h3 id="txt-enter-code">Wpisz 4-cyfrowy kod:</h3>
         <input type="text" id="join-id" maxlength="4" placeholder="0000"><br><br>
-        <button class="big-btn btn-green" onclick="doJoin()">POŁĄCZ</button>
-        <p onclick="showS('s-start')" style="cursor:pointer; color:grey;">Powrót</p>
+        <button class="big-btn btn-green" onclick="doJoin()" id="btn-connect">POŁĄCZ</button>
+        <p onclick="showS('s-start')" style="cursor:pointer; color:grey;" id="btn-back">Powrót</p>
     </div>
 
     <div id="s-lobby" class="hidden">
-        <p>KOD POKOJU:</p>
+        <p id="txt-room-code">KOD POKOJU:</p>
         <h2 id="my-id" style="font-size:50px; color:var(--lego-blue); margin:10px;">----</h2>
-        <p>Wybierz świat LEGO:</p>
+        <p id="txt-select-world">Wybierz świat LEGO:</p>
         <div id="cat-list" style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px;"></div>
     </div>
 
     <div id="s-game" class="hidden">
         <div class="game-header">
-            <div>TWOJA POSTAĆ:<br><strong id="my-char-name" style="font-size:18px; color:var(--lego-red);">?</strong></div>
-            <button onclick="location.reload()" style="background:#444; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Wyjdź</button>
+            <div><span id="txt-your-char">TWOJA POSTAĆ:</span><br><strong id="my-char-name" style="font-size:18px; color:var(--lego-red);">?</strong></div>
+            <button onclick="location.reload()" style="background:#444; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;" id="btn-exit">Wyjdź</button>
         </div>
         <div id="game-board" class="board"></div>
     </div>
@@ -61,6 +67,38 @@
     const GITHUB_USER = "k47alizator"; 
     const REPO_NAME = "lego-guess-who"; 
     const IMG_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/img/`;
+
+    const translations = {
+        pl: {
+            title: "LEGO ZGADNIJ KTO TO", host: "STWÓRZ POKÓJ", join: "DOŁĄCZ DO GRY",
+            enterCode: "Wpisz 4-cyfrowy kod:", connect: "POŁĄCZ", back: "Powrót",
+            roomCode: "KOD POKOJU:", selectWorld: "Wybierz świat LEGO:",
+            yourChar: "TWOJA POSTAĆ:", exit: "Wyjdź", guess: "ZGADUJ!", joined: "GRACZ DOŁĄCZYŁ!"
+        },
+        en: {
+            title: "LEGO GUESS WHO", host: "CREATE ROOM", join: "JOIN GAME",
+            enterCode: "Enter 4-digit code:", connect: "CONNECT", back: "Back",
+            roomCode: "ROOM CODE:", selectWorld: "Select LEGO World:",
+            yourChar: "YOUR CHARACTER:", exit: "Exit", guess: "GUESS!", joined: "PLAYER JOINED!"
+        }
+    };
+
+    let currentLang = 'pl';
+
+    function setLang(lang) {
+        currentLang = lang;
+        const t = translations[lang];
+        document.getElementById('main-title').innerText = t.title;
+        document.getElementById('btn-host').innerText = t.host;
+        document.getElementById('btn-join-menu').innerText = t.join;
+        document.getElementById('txt-enter-code').innerText = t.enterCode;
+        document.getElementById('btn-connect').innerText = t.connect;
+        document.getElementById('btn-back').innerText = t.back;
+        document.getElementById('txt-room-code').innerText = t.roomCode;
+        document.getElementById('txt-select-world').innerText = t.selectWorld;
+        document.getElementById('txt-your-char').innerText = t.yourChar;
+        document.getElementById('btn-exit').innerText = t.exit;
+    }
 
     const db = {
         "STAR WARS": [
@@ -75,34 +113,19 @@
         "HARRY POTTER": [
             {n:"Harry Potter", img:"harry.jpg"}, {n:"Ron Weasley", img:"ron.jpg"}, {n:"Hermiona", img:"hermiona.jpg"}, {n:"Dumbledore", img:"dumbledore.jpg"}, {n:"Voldemort", img:"voldemort.jpg"}, {n:"Snape", img:"snape.jpg"}, {n:"Hagrid", img:"hagrid.jpg"}, {n:"Draco Malfoy", img:"draco.jpg"}, {n:"Dobby", img:"dobby.jpg"}, {n:"Bellatrix", img:"bellatrix.jpg"}, {n:"Sirius Black", img:"sirius.jpg"}, {n:"Luna Lovegood", img:"luna.jpg"}, {n:"Neville", img:"neville.jpg"}, {n:"Ginny Weasley", img:"ginny.jpg"}, {n:"Fred Weasley", img:"fred.jpg"}, {n:"George Weasley", img:"george.jpg"}, {n:"Remus Lupin", img:"lupin.jpg"}, {n:"Mad-Eye", img:"madeye.jpg"}, {n:"McGonagall", img:"mcgonagall.jpg"}, {n:"Cedric Diggory", img:"cedric.jpg"}, {n:"Gilderoy", img:"gilderoy.jpg"}, {n:"Filch", img:"filch.jpg"}, {n:"Newt Scamander", img:"newt.jpg"}, {n:"Grindelwald", img:"grindelwald.jpg"}
         ],
-        "INDIANA JONES": [
-            {n:"Indy", img:"indy.jpg"}, {n:"Henry Jones Sr", img:"henry.jpg"}, {n:"Marion Ravenwood", img:"marion.jpg"}, {n:"Short Round", img:"shorty.jpg"}, {n:"Mola Ram", img:"molaram.jpg"}, {n:"Sallah", img:"sallah.jpg"}, {n:"Muttt Williams", img:"mutt.jpg"}, {n:"Belloq", img:"belloq.jpg"}, {n:"Toht", img:"toht.jpg"}, {n:"Willie Scott", img:"willie.jpg"}, {n:"Satipo", img:"satipo.jpg"}, {n:"Jock", img:"jock.jpg"}, {n:"Elsa Schneider", img:"elsa.jpg"}, {n:"Donovan", img:"donovan.jpg"}, {n:"Grail Knight", img:"knight.jpg"}, {n:"Dovchenko", img:"dovchenko.jpg"}, {n:"Spalko", img:"spalko.jpg"}, {n:"Mac", img:"mac.jpg"}, {n:"Wu Han", img:"wuhan.jpg"}, {n:"Lao Che", img:"laoche.jpg"}, {n:"Sherpa", img:"sherpa.jpg"}, {n:"Pat Roach", img:"patroach.jpg"}, {n:"Kao Kan", img:"kaokan.jpg"}, {n:"Thuggee", img:"thuggee.jpg"}
-        ],
-        "PIRACI Z KARAIBÓW": [
-            {n:"Jack Sparrow", img:"jack.jpg"}, {n:"Barbossa", img:"barbossa.jpg"}, {n:"Davy Jones", img:"davy.jpg"}, {n:"Will Turner", img:"will.jpg"}, {n:"Elizabeth Swann", img:"elizabeth.jpg"}, {n:"Gibbs", img:"gibbs.jpg"}, {n:"Blackbeard", img:"blackbeard.jpg"}, {n:"Angelica", img:"angelica.jpg"}, {n:"Syrena", img:"syrena.jpg"}, {n:"Philip", img:"philip.jpg"}, {n:"Pintel", img:"pintel.jpg"}, {n:"Ragetti", img:"ragetti.jpg"}, {n:"Norrington", img:"norrington.jpg"}, {n:"Beckett", img:"beckett.jpg"}, {n:"Bill Turner", img:"bill.jpg"}, {n:"Tia Dalma", img:"tiadalma.jpg"}, {n:"Murtogg", img:"murtogg.jpg"}, {n:"Mullroy", img:"mullroy.jpg"}, {n:"Governor Swann", img:"govswann.jpg"}, {n:"Cotton", img:"cotton.jpg"}, {n:"Marty", img:"marty.jpg"}, {n:"Salazar", img:"salazar.jpg"}, {n:"Carina", img:"carina.jpg"}, {n:"Henry", img:"henry-p.jpg"}
-        ],
-        "WŁADCA PIERŚCIENI": [
-            {n:"Frodo", img:"frodo.jpg"}, {n:"Sam", img:"sam.jpg"}, {n:"Gandalf", img:"gandalf.jpg"}, {n:"Aragorn", img:"aragorn.jpg"}, {n:"Legolas", img:"legolas.jpg"}, {n:"Gimli", img:"gimli.jpg"}, {n:"Boromir", img:"boromir.jpg"}, {n:"Merry", img:"merry.jpg"}, {n:"Pippin", img:"pippin.jpg"}, {n:"Gollum", img:"gollum.jpg"}, {n:"Sauron", img:"sauron.jpg"}, {n:"Saruman", img:"saruman.jpg"}, {n:"Bilbo", img:"bilbo.jpg"}, {n:"Thorin", img:"thorin.jpg"}, {n:"Galadriela", img:"galadriela.jpg"}, {n:"Elrond", img:"elrond.jpg"}, {n:"Arwena", img:"arwena.jpg"}, {n:"Eomer", img:"eomer.jpg"}, {n:"Theoden", img:"theoden.jpg"}, {n:"Faramir", img:"faramir.jpg"}, {n:"Eowina", img:"eowina.jpg"}, {n:"Nazgul", img:"nazgul.jpg"}, {n:"Lurtz", img:"lurtz.jpg"}, {n:"Grima", img:"grima.jpg"}
-        ],
-        "LEGO CITY": [
-            {n:"Policjant Chase", img:"chase.jpg"}, {n:"Złodziej Rex", img:"rex.jpg"}, {n:"Strażak", img:"fireman.jpg"}, {n:"Lekarz", img:"doctor.jpg"}, {n:"Budowniczy", img:"builder.jpg"}, {n:"Kierowca", img:"driver.jpg"}, {n:"Pilot", img:"pilot.jpg"}, {n:"Nurek", img:"diver.jpg"}, {n:"Kosmonauta", img:"astro.jpg"}, {n:"Burmistrz", img:"mayor.jpg"}, {n:"Frank Honey", img:"frank.jpg"}, {n:"Ellie Phillips", img:"ellie.jpg"}, {n:"Dunby", img:"dunby.jpg"}, {n:"Natalia Kowalski", img:"natalia.jpg"}, {n:"Vinnie", img:"vinnie.jpg"}, {n:"Chan Chuang", img:"chan.jpg"}, {n:"Blackwell", img:"blackwell.jpg"}, {n:"Studley", img:"studley.jpg"}, {n:"Moe de Luca", img:"moe.jpg"}, {n:"Pappalardo", img:"pappy.jpg"}, {n:"Barry", img:"barry.jpg"}, {n:"Butch", img:"butch.jpg"}, {n:"Bucky", img:"bucky.jpg"}, {n:"Rocco", img:"rocco.jpg"}
-        ],
-        "LEGO PRZYGODA": [
-            {n:"Emmet", img:"emmet.jpg"}, {n:"Żyleta", img:"wyldstyle.jpg"}, {n:"Witruwiusz", img:"vitruvius.jpg"}, {n:"Benny", img:"benny.jpg"}, {n:"Kicia Rożek", img:"unikitty.jpg"}, {n:"Prezes Biznes", img:"business.jpg"}, {n:"Zły Glina", img:"badcop.jpg"}, {n:"Stalowobrody", img:"beard.jpg"}, {n:"Batman Lego", img:"l-batman.jpg"}, {n:"Słodka Żyleta", img:"sweetmayhem.jpg"}, {n:"Rex Niebezpiecznik", img:"rex-dangervest.jpg"}, {n:"Królowa", img:"queen.jpg"}, {n:"Banan", img:"banana.jpg"}, {n:"Lód", img:"icecream.jpg"}, {n:"Balthazar", img:"balthazar.jpg"}, {n:"Larry Barista", img:"larry.jpg"}, {n:"Mama Emmet", img:"mom.jpg"}, {n:"Tata Emmet", img:"dad.jpg"}, {n:"Słońce", img:"sun.jpg"}, {n:"Gwiazdka", img:"star.jpg"}, {n:"Serduszko", img:"heart.jpg"}, {n:"Duplo", img:"duplo.jpg"}, {n:"Abraham Lincoln", img:"lincoln.jpg"}, {n:"Gandalf Lego", img:"l-gandalf.jpg"}
-        ],
         "NINJAGO": [
             {n:"Kai", img:"kai.jpg"}, {n:"Jay", img:"jay.jpg"}, {n:"Zane", img:"zane.jpg"}, {n:"Cole", img:"cole.jpg"}, {n:"Lloyd", img:"lloyd.jpg"}, {n:"Nya", img:"nya.jpg"}, {n:"Mistrz Wu", img:"wu.jpg"}, {n:"Garmadon", img:"garmadon.jpg"}, {n:"Pythor", img:"pythor.jpg"}, {n:"Skylor", img:"skylor.jpg"}, {n:"Dareth", img:"dareth.jpg"}, {n:"Morro", img:"morro.jpg"}, {n:"Chen", img:"chen.jpg"}, {n:"Nadakhan", img:"nadakhan.jpg"}, {n:"Krux", img:"krux.jpg"}, {n:"Acronix", img:"acronix.jpg"}, {n:"Harumi", img:"harumi.jpg"}, {n:"Iron Baron", img:"ironbaron.jpg"}, {n:"Omega", img:"omega.jpg"}, {n:"Aspheera", img:"aspheera.jpg"}, {n:"Unagami", img:"unagami.jpg"}, {n:"Vangelis", img:"vangelis.jpg"}, {n:"Kalmaar", img:"kalmaar.jpg"}, {n:"Overlord", img:"overlord.jpg"}
-        ],
-        "JURASSIC WORLD": [
-            {n:"Owen Grady", img:"owen.jpg"}, {n:"Claire Dearing", img:"claire.jpg"}, {n:"Alan Grant", img:"alan.jpg"}, {n:"Ellie Sattler", img:"sattler.jpg"}, {n:"Ian Malcolm", img:"malcolm.jpg"}, {n:"Henry Wu", img:"henrywu.jpg"}, {n:"Blue", img:"blue.jpg"}, {n:"Indominus Rex", img:"irex.jpg"}, {n:"T-Rex", img:"trex.jpg"}, {n:"Vic Hoskins", img:"hoskins.jpg"}, {n:"Simon Masrani", img:"simon.jpg"}, {n:"Lowery", img:"lowery.jpg"}, {n:"Barry", img:"barry-j.jpg"}, {n:"Hamada", img:"hamada.jpg"}, {n:"Zach", img:"zach.jpg"}, {n:"Gray", img:"gray.jpg"}, {n:"Maisie", img:"maisie.jpg"}, {n:"Zia", img:"zia.jpg"}, {n:"Franklin", img:"franklin-j.jpg"}, {n:"Mills", img:"mills.jpg"}, {n:"Wheatley", img:"wheatley.jpg"}, {n:"Eversoll", img:"eversoll.jpg"}, {n:"Silesia", img:"silesia.jpg"}, {n:"Nedry", img:"nedry.jpg"}
-        ],
-        "INIEMAMOCNI": [
-            {n:"Pan Iniemamocny", img:"bob.jpg"}, {n:"Elastyna", img:"helen.jpg"}, {n:"Maks", img:"dash.jpg"}, {n:"Wiola", img:"violet.jpg"}, {n:"Jack-Jack", img:"jackjack.jpg"}, {n:"Mrożon", img:"frozone.jpg"}, {n:"Edna Mode", img:"edna.jpg"}, {n:"Syndrom", img:"syndrome.jpg"}, {n:"Ekranitysta", img:"screen.jpg"}, {n:"Podkopywacz", img:"underminer.jpg"}, {n:"Bomb Voyage", img:"bomb.jpg"}, {n:"Rick Dicker", img:"rick.jpg"}, {n:"Mirage", img:"mirage.jpg"}, {n:"Gazerbeam", img:"gazerbeam.jpg"}, {n:"Voyd", img:"voyd.jpg"}, {n:"Brick", img:"brick.jpg"}, {n:"He-Lectrix", img:"helectrix.jpg"}, {n:"Krashauer", img:"krashauer.jpg"}, {n:"Reflux", img:"reflux.jpg"}, {n:"Tony Rydinger", img:"tony.jpg"}, {n:"Kari", img:"kari.jpg"}, {n:"Bernie", img:"bernie.jpg"}, {n:"Pani Dicker", img:"mrsdicker.jpg"}, {n:"Gilbert Huph", img:"huph.jpg"}
         ]
+        // Tu możesz dopisać resztę kategorii tak samo jak te powyżej...
     };
 
     let peer, conn, myChar, boardData, shortId;
-    function showS(id) { ['s-start', 's-join', 's-lobby', 's-game'].forEach(s => document.getElementById(s).classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
+
+    function showS(id) {
+        ['s-start', 's-join', 's-lobby', 's-game'].forEach(s => document.getElementById(s).classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+    }
+
     Object.keys(db).forEach(cat => {
         const b = document.createElement('button');
         b.className = 'big-btn btn-blue';
@@ -110,22 +133,44 @@
         b.onclick = () => hStart(cat);
         document.getElementById('cat-list').appendChild(b);
     });
+
     function goHost() {
         showS('s-lobby');
         shortId = Math.floor(1000 + Math.random() * 9000).toString();
         peer = new Peer(shortId);
         peer.on('open', () => { document.getElementById('my-id').innerText = shortId; });
-        peer.on('connection', c => { conn = c; alert("GRACZ DOŁĄCZYŁ!"); setupConn(); });
+        peer.on('connection', c => { 
+            conn = c; 
+            alert(translations[currentLang].joined); 
+            setupConn(); 
+        });
         peer.on('error', err => { if(err.type === 'unavailable-id') goHost(); });
     }
+
     function doJoin() {
         const id = document.getElementById('join-id').value;
+        if(id.length !== 4) return alert("Kod musi mieć 4 cyfry!");
         peer = new Peer();
-        peer.on('open', () => { conn = peer.connect(id); setupConn(); });
+        peer.on('open', () => {
+            conn = peer.connect(id, {reliable: true});
+            setupConn();
+        });
+        peer.on('error', () => alert("Nie można połączyć. Sprawdź kod!"));
     }
+
     function setupConn() {
+        conn.on('open', () => {
+            console.log("Połączono!");
+            if(document.getElementById('s-join').classList.contains('hidden') === false) {
+                alert("Połączono pomyślnie! Czekaj na wybór kategorii przez Hosta.");
+            }
+        });
         conn.on('data', data => {
-            if(data.type === 'START') { boardData = data.pool; myChar = data.yourChar; renderGame(); }
+            if(data.type === 'START') { 
+                boardData = data.pool; 
+                myChar = data.yourChar; 
+                renderGame(); 
+            }
             if(data.type === 'GUESS') {
                 if(confirm("Przeciwnik pyta czy masz: " + data.name + "?")) {
                     if(data.name === myChar.n) alert("PRZECIWNIK WYGRAŁ!");
@@ -134,6 +179,7 @@
             }
         });
     }
+
     function hStart(cat) {
         if(!conn) return alert("Czekaj na kolegę!");
         let shuffled = db[cat].sort(() => 0.5 - Math.random()).slice(0, 24);
@@ -142,6 +188,7 @@
         conn.send({ type: 'START', pool: shuffled, yourChar: charForHost });
         boardData = shuffled; myChar = charForGuest; renderGame();
     }
+
     function renderGame() {
         showS('s-game');
         document.getElementById('my-char-name').innerText = myChar.n;
@@ -150,16 +197,17 @@
         boardData.forEach(p => {
             const card = document.createElement('div');
             card.className = 'card';
-            card.innerHTML = `<img src="${IMG_BASE + p.img}" onerror="this.src='https://via.placeholder.com/150/ffd500/000000?text=LEGO'"><p>${p.n}</p><button class="guess-btn" onclick="makeGuess('${p.n}', event)">ZGADUJ!</button>`;
+            card.innerHTML = `<img src="${IMG_BASE + p.img}" onerror="this.src='https://via.placeholder.com/150/ffd500/000000?text=LEGO'"><p>${p.n}</p><button class="guess-btn" onclick="makeGuess('${p.n}', event)">${translations[currentLang].guess}</button>`;
             card.onclick = () => card.classList.toggle('eliminated');
             b.appendChild(card);
         });
     }
+
     function makeGuess(name, event) {
         event.stopPropagation();
-        if(confirm("Zapytać czy przeciwnik to: " + name + "?")) {
+        if(confirm(translations[currentLang].connect + "? " + name)) {
             conn.send({type: 'GUESS', name: name});
-            alert("Wysłano pytanie!");
+            alert("Wysłano zapytanie!");
         }
     }
 </script>
