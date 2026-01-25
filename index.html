@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEGO Guess Who - Ultimate Edition</title>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        :root { --lego-red: #da291c; --lego-blue: #006cb7; --lego-yellow: #ffd500; --lego-white: #ffffff; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f0f0; margin: 0; padding: 0; user-select: none; }
+        
+        /* FLAGI JĘZYKOWE */
+        .lang-switch { position: fixed; top: 15px; right: 15px; display: flex; gap: 10px; z-index: 1000; }
+        .flag { font-size: 35px; cursor: pointer; filter: grayscale(1); opacity: 0.4; transition: 0.3s; border-radius: 5px; padding: 2px; }
+        .flag.active { filter: grayscale(0); opacity: 1; transform: scale(1.1); outline: 3px solid var(--lego-blue); }
+
+        .container { max-width: 1000px; margin: 40px auto; background: var(--lego-white); padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); position: relative; border: 6px solid var(--lego-yellow); }
+        h1 { color: var(--lego-red); text-align: center; text-transform: uppercase; font-size: 36px; margin-bottom: 30px; }
+        .hidden { display: none !important; }
+
+        /* MENU STARTOWE */
+        .menu-flex { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 50px 0; }
+        .big-btn { width: 350px; padding: 25px; font-size: 24px; border: none; border-radius: 15px; cursor: pointer; color: white; font-weight: bold; transition: 0.2s; box-shadow: 0 6px 0 #000; }
+        .btn-create { background: var(--lego-blue); }
+        .btn-join { background: #28a745; }
+        .big-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #000; }
+
+        /* GRID KATEGORII */
+        .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-top: 25px; }
+        .cat-card { padding: 15px; background: white; border: 3px solid #ddd; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; text-align: center; }
+        .cat-card:hover { border-color: var(--lego-blue); background: #f0f7ff; }
+        .mega-mix { grid-column: 1 / -1; background: linear-gradient(45deg, #ffd500, #ff9900); border: 3px solid #b8860b; font-size: 20px; }
+
+        /* GRA */
+        .game-header { background: var(--lego-yellow); padding: 20px; border-radius: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; border: 2px solid #ccac00; }
+        .board { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        .card { background: white; border: 4px solid #eee; border-radius: 12px; padding: 10px; cursor: pointer; text-align: center; transition: 0.2s; height: 200px; display: flex; flex-direction: column; align-items: center; }
+        .card img { max-width: 100%; max-height: 140px; object-fit: contain; margin-bottom: 10px; }
+        .card p { margin: 0; font-weight: bold; font-size: 14px; }
+        .card.eliminated { opacity: 0.1; filter: grayscale(1); }
+
+        input { padding: 15px; font-size: 22px; border-radius: 10px; border: 3px solid var(--lego-blue); width: 300px; text-align: center; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="lang-switch">
+    <div id="f-pl" class="flag active" onclick="setLanguage('pl')">🇵🇱</div>
+    <div id="f-en" class="flag" onclick="setLanguage('en')">🇬🇧</div>
+</div>
+
+<div class="container">
+    <h1 id="main-title">LEGO GUESS WHO</h1>
+
+    <div id="screen-start" class="menu-flex">
+        <button class="big-btn btn-create" onclick="setupHost()">
+            <span class="pl">STWÓRZ GRĘ</span><span class="en hidden">CREATE GAME</span>
+        </button>
+        <button class="big-btn btn-join" onclick="showScreen('screen-join')">
+            <span class="pl">DOŁĄCZ DO GRY</span><span class="en hidden">JOIN GAME</span>
+        </button>
+    </div>
+
+    <div id="screen-join" class="hidden menu-flex">
+        <h2 class="pl">Wpisz kod od znajomego:</h2><h2 class="en hidden">Enter friend's code:</h2>
+        <input type="text" id="join-input" placeholder="KOD / CODE">
+        <button class="big-btn btn-join" onclick="joinByCode()">
+            <span class="pl">POŁĄCZ</span><span class="en hidden">CONNECT</span>
+        </button>
+        <button onclick="showScreen('screen-start')" style="background:none; border:none; color:grey; cursor:pointer;">← Wstecz / Back</button>
+    </div>
+
+    <div id="screen-lobby" class="hidden">
+        <div style="text-align:center; padding:20px; background:#e8f0fe; border-radius:15px; border: 3px dashed var(--lego-blue); margin-bottom:30px;">
+            <p class="pl">TWÓJ KOD POKOJU:</p><p class="en hidden">YOUR ROOM CODE:</p>
+            <h2 id="display-id" style="color:var(--lego-blue); font-size:32px; margin:10px 0;">...</h2>
+            <small class="pl">(Wyślij ten kod drugiemu graczowi)</small><small class="en hidden">(Send this code to the other player)</small>
+        </div>
+        
+        <h3 class="pl">Wybierz kategorię postaci:</h3><h3 class="en hidden">Select character category:</h3>
+        <div class="cat-grid" id="category-buttons">
+            <button class="cat-card mega-mix" onclick="startGame('all')">🌟 MEGA MIX (ALL SERIES)</button>
+        </div>
+    </div>
+
+    <div id="screen-game" class="hidden">
+        <div class="game-header">
+            <div>
+                <span class="pl">TWOJA POSTAĆ:</span><span class="en hidden">YOUR CHARACTER:</span><br>
+                <strong id="secret-name" style="color:var(--lego-red); font-size:26px;">?</strong>
+            </div>
+            <button onclick="location.reload()" style="padding:10px 20px; border-radius:8px; cursor:pointer; background:#444; color:white; border:none;">Reset</button>
+        </div>
+        <div id="game-board" class="board"></div>
+    </div>
+</div>
+
+<script>
+    // --- KONFIGURACJA ZDJĘĆ ---
+    const GITHUB_USER = "TWÓJ_NICK"; // <--- WPISZ SWÓJ NICK
+    const REPO_NAME = "TWOJA_NAZWA_REPO"; // <--- WPISZ NAZWĘ REPO
+    const IMG_PATH = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/img/`;
+
+    // --- BAZA DANYCH POSTACI ---
+    const db = {
+        "Star Wars": [
+            {pl:"Darth Vader", en:"Darth Vader", img:"vader.jpg"},
+            {pl:"Luke Skywalker", en:"Luke Skywalker", img:"luke.jpg"},
+            {pl:"Yoda", en:"Yoda", img:"yoda.jpg"},
+            {pl:"Han Solo", en:"Han Solo", img:"han.jpg"},
+            {pl:"Chewbacca", en:"Chewbacca", img:"chewie.jpg"},
+            {pl:"R2-D2", en:"R2-D2", img:"r2d2.jpg"},
+            {pl:"Boba Fett", en:"Boba Fett", img:"boba.jpg"},
+            {pl:"Kylo Ren", en:"Kylo Ren", img:"kylo.jpg"}
+        ],
+        "Batman": [
+            {pl:"Batman", en:"Batman", img:"batman.jpg"},
+            {pl:"Joker", en:"Joker", img:"joker.jpg"},
+            {pl:"Robin", en:"Robin", img:"robin.jpg"},
+            {pl:"Harley Quinn", en:"Harley Quinn", img:"harley.jpg"}
+        ],
+        "Harry Potter": [
+            {pl:"Harry Potter", en:"Harry Potter", img:"harry.jpg"},
+            {pl:"Hermiona", en:"Hermione", img:"hermiona.jpg"},
+            {pl:"Ron Weasley", en:"Ron Weasley", img:"ron.jpg"},
+            {pl:"Voldemort", en:"Voldemort", img:"voldemort.jpg"}
+        ],
+        "Marvel": [{pl:"Iron Man", en:"Iron Man", img:"ironman.jpg"}, {pl:"Spider-Man", en:"Spider-Man", img:"spiderman.jpg"}],
+        "Ninjago": [{pl:"Kai", en:"Kai", img:"kai.jpg"}, {pl:"Lloyd", en:"Lloyd", img:"lloyd.jpg"}],
+        "LEGO Movie": [{pl:"Emmet", en:"Emmet", img:"emmet.jpg"}, {pl:"Żyleta", en:"Wyldstyle", img:"wyldstyle.jpg"}],
+        "Jurassic World": [{pl:"Owen Grady", en:"Owen", img:"owen.jpg"}],
+        "Indiana Jones": [{pl:"Indy", en:"Indy", img:"indy.jpg"}],
+        "Lord of the Rings": [{pl:"Frodo", en:"Frodo", img:"frodo.jpg"}],
+        "Pirates": [{pl:"Kapitan", en:"Captain", img:"capt.jpg"}],
+        "City": [{pl:"Policjant", en:"Police", img:"police.jpg"}],
+        "Incredibles": [{pl:"Pan Iniemamocny", en:"Mr. Incredible", img:"inc.jpg"}],
+        "The Hobbit": [{pl:"Bilbo", en:"Bilbo", img:"bilbo.jpg"}],
+        "DC Villains": [{pl:"Lex Luthor", en:"Lex Luthor", img:"lex.jpg"}]
+    };
+
+    const cats = Object.keys(db);
+    let lang = 'pl', peer, conn, mySecretChar, boardData;
+
+    // Generuj przyciski kategorii
+    cats.forEach(c => {
+        const b = document.createElement('button');
+        b.className = 'cat-card';
+        b.innerText = c;
+        b.onclick = () => hostStartGame(c);
+        document.getElementById('category-buttons').appendChild(b);
+    });
+
+    function setLanguage(l) {
+        lang = l;
+        document.getElementById('f-pl').classList.toggle('active', l === 'pl');
+        document.getElementById('f-en').classList.toggle('active', l === 'en');
+        document.querySelectorAll('.pl').forEach(e => e.classList.toggle('hidden', l !== 'pl'));
+        document.querySelectorAll('.en').forEach(e => e.classList.toggle('hidden', l !== 'en'));
+        if(mySecretChar) document.getElementById('secret-name').innerText = mySecretChar[lang];
+        if(boardData) renderBoard();
+    }
+
+    function showScreen(id) {
+        ['screen-start', 'screen-join', 'screen-lobby', 'screen-game'].forEach(s => document.getElementById(s).classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function setupHost() {
+        showScreen('screen-lobby');
+        peer = new Peer();
+        peer.on('open', id => document.getElementById('display-id').innerText = id);
+        peer.on('connection', c => { conn = c; alert("GRACZ POŁĄCZONY!"); });
+    }
+
+    function joinByCode() {
+        const code = document.getElementById('join-input').value;
+        peer = new Peer();
+        peer.on('open', () => {
+            conn = peer.connect(code);
+            conn.on('data', data => { if(data.type === 'START') { boardData = data.pool; launchGame(); } });
+            alert("POŁĄCZONO! Czekaj na wybór kategorii przez hosta.");
+        });
+    }
+
+    function hostStartGame(cat) {
+        if(!conn) return alert("Brak drugiego gracza!");
+        let pool = cat === 'all' ? [].concat(...Object.values(db)) : db[cat];
+        // Tasowanie i wybór 24 postaci
+        const shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, 24);
+        conn.send({ type: 'START', pool: shuffled });
+        boardData = shuffled;
+        launchGame();
+    }
+
+    function launchGame() {
+        showScreen('screen-game');
+        mySecretChar = boardData[Math.floor(Math.random() * boardData.length)];
+        document.getElementById('secret-name').innerText = mySecretChar[lang];
+        renderBoard();
+    }
+
+    function renderBoard() {
+        const board = document.getElementById('game-board');
+        board.innerHTML = '';
+        boardData.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `<img src="${IMG_PATH + p.img}" onerror="this.src='https://via.placeholder.com/150/ffd500/000000?text=LEGO'"><p>${p[lang]}</p>`;
+            card.onclick = () => card.classList.toggle('eliminated');
+            board.appendChild(card);
+        });
+    }
+</script>
+
+</body>
+</html>
