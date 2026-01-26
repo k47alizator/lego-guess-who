@@ -9,17 +9,18 @@
         :root { --lego-red: #da291c; --lego-blue: #006cb7; --lego-yellow: #ffd500; --lego-white: #ffffff; }
         body { font-family: 'Arial Black', sans-serif; background: #e5e5e5; margin: 0; padding: 10px; text-align: center; }
         
-        /* Stały przełącznik języka w rogu */
-        .lang-switcher { position: fixed; top: 15px; right: 15px; z-index: 2000; background: white; padding: 5px; border-radius: 10px; border: 3px solid var(--lego-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex; gap: 5px; }
-        .lang-btn { font-size: 24px; cursor: pointer; border: none; background: none; padding: 5px; transition: transform 0.2s; }
-        .lang-btn:hover { transform: scale(1.2); }
+        /* Dynamiczny przełącznik języka */
+        .lang-switcher { position: fixed; top: 15px; right: 15px; z-index: 2000; }
+        .lang-toggle-btn { font-size: 35px; cursor: pointer; border: 3px solid var(--lego-blue); background: white; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; padding: 0; }
+        .lang-toggle-btn:hover { transform: scale(1.1); }
 
-        .container { max-width: 1200px; margin: 40px auto 0; background: white; padding: 20px; border-radius: 20px; border: 5px solid var(--lego-yellow); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; }
+        .container { max-width: 1200px; margin: 50px auto 0; background: white; padding: 20px; border-radius: 20px; border: 5px solid var(--lego-yellow); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; }
         .hidden { display: none !important; }
         
         .big-btn { width: 220px; padding: 15px; margin: 5px; font-size: 13px; border-radius: 10px; border: none; color: white; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #000; transition: 0.1s; text-transform: uppercase; }
         .btn-blue { background: var(--lego-blue); }
         .btn-green { background: #28a745; }
+        .btn-red { background: var(--lego-red); }
         .btn-mixed { background: linear-gradient(45deg, #da291c, #006cb7, #ffd500); color: black !important; border: 2px solid black; }
         
         .board { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 20px; }
@@ -36,14 +37,14 @@
         #result-img { width: 200px; height: 200px; object-fit: contain; }
 
         input { padding: 12px; font-size: 22px; border-radius: 8px; border: 3px solid var(--lego-blue); text-align: center; width: 220px; text-transform: uppercase; }
-        #room-display { font-size: 40px; color: var(--lego-blue); background: #f0f0f0; padding: 10px 20px; border-radius: 10px; display: inline-block; margin: 10px 0; border: 2px dashed #ccc; }
+        #room-display { font-size: 40px; color: var(--lego-blue); background: #f0f0f0; padding: 10px 20px; border-radius: 10px; display: inline-block; margin: 10px 0; border: 2px dashed #ccc; font-weight: bold; }
+        .back-link { margin-top: 20px; display: block; color: #666; cursor: pointer; text-decoration: underline; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div class="lang-switcher">
-    <button class="lang-btn" onclick="pickLang('pl')">🇵🇱</button>
-    <button class="lang-btn" onclick="pickLang('en')">🇬🇧</button>
+    <button id="lang-toggle" class="lang-toggle-btn" onclick="toggleLanguage()">🇬🇧</button>
 </div>
 
 <div class="container">
@@ -57,7 +58,7 @@
         <h3 id="txt-inputCode">Wpisz kod pokoju:</h3>
         <input type="text" id="join-id" placeholder="KOD..."><br><br>
         <button class="big-btn btn-green" onclick="doJoin()" id="txt-connect">POŁĄCZ</button>
-        <p id="txt-back" onclick="showS('s-main')" style="cursor:pointer; color:grey;">Wstecz</p>
+        <span class="back-link" onclick="location.reload()" id="txt-back">Wstecz</span>
     </div>
 
     <div id="s-lobby" class="hidden">
@@ -65,12 +66,13 @@
         <div id="room-display">...</div>
         <p id="wait-msg">Czekaj na kolegę...</p>
         <div id="cat-list" class="hidden" style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px;"></div>
+        <span class="back-link" onclick="location.reload()" id="txt-back2">WYJDŹ / POWRÓT</span>
     </div>
 
     <div id="s-game" class="hidden">
         <div class="game-header">
             <div><span id="txt-youAre">TWOJA POSTAĆ:</span><br><strong id="my-char-name" style="font-size:18px; color:var(--lego-red);">?</strong></div>
-            <button onclick="location.reload()" id="txt-exit" style="background:#444; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">WYJDŹ</button>
+            <button onclick="location.reload()" id="txt-exit" class="btn-red" style="width:100px; padding:10px; font-size:12px; box-shadow:none;">WYJDŹ</button>
         </div>
         <div id="game-board" class="board"></div>
     </div>
@@ -93,46 +95,42 @@
     const IMG_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/img/`;
 
     const langData = {
-        pl: { title: "LEGO ZGADNIJ KTO TO", host: "STWÓRZ POKÓJ", join: "DOŁĄCZ DO GRY", inputCode: "Wpisz kod pokoju:", connect: "POŁĄCZ", yourCode: "TWÓJ KOD POKOJU:", wait: "Czekaj na kolegę...", youAre: "TWOJA POSTAĆ:", exit: "WYJDŹ", guess: "ZGADUJ!", mixed: "⭐ WSZYSTKO MIESZANE ⭐", win: "WYGRAŁEŚ!", lose: "PRZEGRAŁEŚ!", was: "To był(a):", replay: "ZAGRAJ PONOWNIE", back: "Wstecz", confirmG: "Czy na pewno zgadujesz: ", alertMiss: "Pudło! To nie ta postać.", alertJoin: "Gracz dołączył!" },
-        en: { title: "LEGO GUESS WHO", host: "CREATE ROOM", join: "JOIN GAME", inputCode: "Enter room code:", connect: "CONNECT", yourCode: "YOUR ROOM CODE:", wait: "Waiting for player...", youAre: "YOUR CHARACTER:", exit: "EXIT", guess: "GUESS!", mixed: "⭐ ALL MIXED ⭐", win: "YOU WIN!", lose: "YOU LOSE!", was: "It was:", replay: "PLAY AGAIN", back: "Back", confirmG: "Are you sure you guess: ", alertMiss: "Miss! That's not the character.", alertJoin: "Player joined!" }
+        pl: { title: "LEGO ZGADNIJ KTO TO", host: "STWÓRZ POKÓJ", join: "DOŁĄCZ DO GRY", inputCode: "Wpisz kod pokoju:", connect: "POŁĄCZ", yourCode: "TWÓJ KOD POKOJU:", wait: "Czekaj na kolegę...", youAre: "TWOJA POSTAĆ:", exit: "WYJDŹ", guess: "ZGADUJ!", mixed: "⭐ WSZYSTKO MIESZANE ⭐", win: "WYGRAŁEŚ!", lose: "PRZEGRAŁEŚ!", was: "To był(a):", replay: "ZAGRAJ PONOWNIE", back: "Wstecz", back2: "POWRÓT DO MENU", confirmG: "Czy na pewno zgadujesz: ", alertMiss: "Pudło! To nie ta postać.", alertJoin: "Gracz dołączył!", nextLang: "🇬🇧" },
+        en: { title: "LEGO GUESS WHO", host: "CREATE ROOM", join: "JOIN GAME", inputCode: "Enter room code:", connect: "CONNECT", yourCode: "YOUR ROOM CODE:", wait: "Waiting for player...", youAre: "YOUR CHARACTER:", exit: "EXIT", guess: "GUESS!", mixed: "⭐ ALL MIXED ⭐", win: "YOU WIN!", lose: "YOU LOSE!", was: "It was:", replay: "PLAY AGAIN", back: "Back", back2: "BACK TO MENU", confirmG: "Are you sure you guess: ", alertMiss: "Miss! That's not the character.", alertJoin: "Player joined!", nextLang: "🇵🇱" }
     };
+    
     let curL = 'pl';
-
-    const db = {
-        "STAR WARS": [
-            {n:"Darth Vader", img:"vader.jpg"}, {n:"Mistrz Yoda", img:"yoda.jpg"}, {n:"Luke Skywalker", img:"luke.jpg"}, {n:"R2-D2", img:"r2d2.jpg"}, {n:"Chewbacca", img:"chewie.jpg"}, {n:"Han Solo", img:"han.jpg"}, {n:"Księżniczka Leia", img:"leia.jpg"}, {n:"C-3PO", img:"c3po.jpg"}, {n:"Boba Fett", img:"boba.jpg"}, {n:"Szturmowiec Imperium", img:"storm.jpg"}, {n:"Kylo Ren", img:"kylo.jpg"}, {n:"Rey Skywalker", img:"rey.jpg"}, {n:"Darth Maul", img:"maul.jpg"}, {n:"Ahsoka Tano", img:"ahsoka.jpg"}, {n:"Obi-Wan Kenobi", img:"obi.jpg"}, {n:"Anakin Skywalker", img:"anakin.jpg"}, {n:"Imperator Palpatine", img:"palp.jpg"}, {n:"Mandalorianin Din Djarin", img:"mando.jpg"}, {n:"Grogu", img:"grogu.jpg"}, {n:"Admirał Ackbar", img:"ackbar.jpg"}, {n:"Lando Calrissian", img:"lando.jpg"}, {n:"Generał Grievous", img:"grievous.jpg"}, {n:"Hrabia Dooku", img:"dooku.jpg"}, {n:"Poe Dameron", img:"poe.jpg"}, {n:"Jabba the Hutt", img:"jabba.jpg"}, {n:"Qui-Gon Jinn", img:"quigon.jpg"}, {n:"Mace Windu", img:"windu.jpg"}, {n:"Kit Fisto", img:"kit.jpg"}, {n:"Ewok Wicket", img:"wicket.jpg"}, {n:"Jango Fett", img:"jango.jpg"}
-        ],
-        "MARVEL": [
-            {n:"Iron Man (Tony Stark)", img:"ironman.jpg"}, {n:"Spider-Man (Peter Parker)", img:"spiderman.jpg"}, {n:"Kapitan Ameryka", img:"cap.jpg"}, {n:"Thor Odinson", img:"thor.jpg"}, {n:"Hulk (Bruce Banner)", img:"hulk.jpg"}, {n:"Czarna Wdowa", img:"widow.jpg"}, {n:"Thanos", img:"thanos.jpg"}, {n:"Czarna Pantera", img:"panther.jpg"}, {n:"Doktor Strange", img:"strange.jpg"}, {n:"Groot", img:"groot.jpg"}, {n:"Rocket Raccoon", img:"rocket.jpg"}, {n:"Ant-Man", img:"antman.jpg"}, {n:"Wolverine (Logan)", img:"wolvie.jpg"}, {n:"Deadpool (Wade Wilson)", img:"deadpool.jpg"}, {n:"Venom", img:"venom.jpg"}, {n:"Loki Laufeyson", img:"loki.jpg"}, {n:"Daredevil", img:"daredevil.jpg"}, {n:"Magneto", img:"magneto.jpg"}, {n:"Scarlet Witch", img:"witch.jpg"}, {n:"Ghost Rider", img:"ghost.jpg"}, {n:"Kapitan Marvel", img:"marvel.jpg"}, {n:"Zimowy Żołnierz", img:"bucky.jpg"}, {n:"Falcon", img:"falcon.jpg"}, {n:"Nick Fury", img:"fury.jpg"}, {n:"Drax Niszczyciel", img:"drax.jpg"}, {n:"Gamora", img:"gamora.jpg"}, {n:"Star-Lord", img:"starlord.jpg"}, {n:"Vision", img:"vision.jpg"}, {n:"Hawkeye", img:"hawkeye.jpg"}, {n:"Blade", img:"blade.jpg"}
-        ],
-        "HARRY POTTER": [
-            {n:"Harry Potter", img:"harry.jpg"}, {n:"Ron Weasley", img:"ron.jpg"}, {n:"Hermiona Granger", img:"hermiona.jpg"}, {n:"Albus Dumbledore", img:"dumbledore.jpg"}, {n:"Lord Voldemort", img:"voldemort.jpg"}, {n:"Severus Snape", img:"snape.jpg"}, {n:"Rubeus Hagrid", img:"hagrid.jpg"}, {n:"Draco Malfoy", img:"draco.jpg"}, {n:"Zgredek", img:"dobby.jpg"}, {n:"Bellatrix Lestrange", img:"bellatrix.jpg"}, {n:"Sirius Black", img:"sirius.jpg"}, {n:"Luna Lovegood", img:"luna.jpg"}, {n:"Neville Longbottom", img:"neville.jpg"}, {n:"Ginny Weasley", img:"ginny.jpg"}, {n:"Remus Lupin", img:"lupin.jpg"}, {n:"Minerwa McGonagall", img:"mcgonagall.jpg"}, {n:"Alastor Szalonooki Moody", img:"madeye.jpg"}, {n:"Cedrik Diggory", img:"cedric.jpg"}, {n:"Lucius Malfoy", img:"lucius.jpg"}, {n:"Sybil Trelawney", img:"trelawney.jpg"}, {n:"Cho Chang", img:"cho.jpg"}, {n:"Fleur Delacour", img:"fleur.jpg"}, {n:"Viktor Krum", img:"krum.jpg"}, {n:"Dolores Umbridge", img:"umbridge.jpg"}, {n:"Aberforth Dumbledore", img:"aberforth.jpg"}, {n:"Fred Weasley", img:"fred.jpg"}, {n:"George Weasley", img:"george.jpg"}, {n:"Argus Filch", img:"filch.jpg"}, {n:"Gilderoy Lockhart", img:"gilderoy.jpg"}, {n:"Narcissa Malfoy", img:"narcissa.jpg"}
-        ]
-        // Pozostałe 11 kategorii analogicznie...
-    };
-
     let peer, conn, myChar, boardData, isHost = false;
 
-    function pickLang(code) {
-        curL = code;
+    // Baza postaci (fragment)
+    const db = {
+        "STAR WARS": [{n:"Darth Vader", img:"vader.jpg"}, {n:"Mistrz Yoda", img:"yoda.jpg"}, {n:"Luke Skywalker", img:"luke.jpg"}, {n:"R2-D2", img:"r2d2.jpg"}, {n:"Chewbacca", img:"chewie.jpg"}, {n:"Han Solo", img:"han.jpg"}, {n:"Księżniczka Leia", img:"leia.jpg"}, {n:"C-3PO", img:"c3po.jpg"}, {n:"Boba Fett", img:"boba.jpg"}, {n:"Szturmowiec Imperium", img:"storm.jpg"}],
+        "MARVEL": [{n:"Iron Man (Tony Stark)", img:"ironman.jpg"}, {n:"Spider-Man (Peter Parker)", img:"spiderman.jpg"}, {n:"Kapitan Ameryka", img:"cap.jpg"}, {n:"Thor Odinson", img:"thor.jpg"}, {n:"Hulk (Bruce Banner)", img:"hulk.jpg"}, {n:"Czarna Wdowa", img:"widow.jpg"}, {n:"Thanos", img:"thanos.jpg"}, {n:"Doktor Strange", img:"strange.jpg"}],
+        "HARRY POTTER": [{n:"Harry Potter", img:"harry.jpg"}, {n:"Ron Weasley", img:"ron.jpg"}, {n:"Hermiona Granger", img:"hermiona.jpg"}, {n:"Albus Dumbledore", img:"dumbledore.jpg"}, {n:"Lord Voldemort", img:"voldemort.jpg"}, {n:"Severus Snape", img:"snape.jpg"}, {n:"Rubeus Hagrid", img:"hagrid.jpg"}, {n:"Draco Malfoy", img:"draco.jpg"}]
+    };
+
+    function toggleLanguage() {
+        curL = (curL === 'pl') ? 'en' : 'pl';
+        updateUI();
+    }
+
+    function updateUI() {
         const L = langData[curL];
-        // Aktualizacja tekstów statycznych
+        document.getElementById('lang-toggle').innerText = L.nextLang;
         document.getElementById('txt-title').innerText = L.title;
         document.getElementById('txt-host').innerText = L.host;
         document.getElementById('txt-join').innerText = L.join;
         document.getElementById('txt-inputCode').innerText = L.inputCode;
         document.getElementById('txt-connect').innerText = L.connect;
         document.getElementById('txt-back').innerText = L.back;
+        document.getElementById('txt-back2').innerText = L.back2;
         document.getElementById('txt-yourCode').innerText = L.yourCode;
         document.getElementById('txt-youAre').innerText = L.youAre;
         document.getElementById('txt-exit').innerText = L.exit;
         document.getElementById('txt-was').innerText = L.was;
         document.getElementById('txt-replay').innerText = L.replay;
         
-        // Aktualizacja przycisków kategorii (jeśli widoczne)
         if(isHost && !document.getElementById('cat-list').classList.contains('hidden')) renderCatList();
-        
-        // Aktualizacja przycisków ZGADUJ na planszy
         document.querySelectorAll('.guess-btn').forEach(btn => btn.innerText = L.guess);
     }
 
@@ -231,6 +229,9 @@
         document.getElementById('result-char-name').innerText = character.n;
         document.getElementById('result-img').src = IMG_BASE + character.img;
     }
+    
+    // Inicjalizacja napisów
+    updateUI();
 </script>
 </body>
 </html>
