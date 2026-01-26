@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEGO ZGADNIJ KTO TO</title>
+    <title>LEGO ZGADNIJ KTO TO - FULL VERSION</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         :root { --lego-red: #da291c; --lego-blue: #006cb7; --lego-yellow: #ffd500; --lego-white: #ffffff; }
@@ -11,34 +11,36 @@
         
         /* Dynamiczny przełącznik języka */
         .lang-switcher { position: fixed; top: 15px; right: 15px; z-index: 2000; }
-        .lang-toggle-btn { font-size: 35px; cursor: pointer; border: 3px solid var(--lego-blue); background: white; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; padding: 0; }
-        .lang-toggle-btn:hover { transform: scale(1.1); }
+        .lang-toggle-btn { font-size: 35px; cursor: pointer; border: 3px solid var(--lego-blue); background: white; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
 
-        .container { max-width: 1200px; margin: 50px auto 0; background: white; padding: 20px; border-radius: 20px; border: 5px solid var(--lego-yellow); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; }
+        .container { max-width: 1200px; margin: 50px auto 0; background: white; padding: 20px; border-radius: 20px; border: 5px solid var(--lego-yellow); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; min-height: 80vh; }
         .hidden { display: none !important; }
         
-        .big-btn { width: 220px; padding: 15px; margin: 5px; font-size: 13px; border-radius: 10px; border: none; color: white; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #000; transition: 0.1s; text-transform: uppercase; }
+        .big-btn { width: 240px; padding: 15px; margin: 8px; font-size: 13px; border-radius: 10px; border: none; color: white; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #000; transition: 0.1s; text-transform: uppercase; }
         .btn-blue { background: var(--lego-blue); }
         .btn-green { background: #28a745; }
         .btn-red { background: var(--lego-red); }
         .btn-mixed { background: linear-gradient(45deg, #da291c, #006cb7, #ffd500); color: black !important; border: 2px solid black; }
         
-        .board { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 20px; }
-        .card { background: #fff; border: 3px solid #ddd; border-radius: 10px; padding: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.2s; }
-        .card img { width: 100%; height: 130px; object-fit: contain; pointer-events: none; }
-        .card p { margin: 8px 0; font-size: 12px; font-weight: bold; pointer-events: none; min-height: 35px; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
-        .card.eliminated { opacity: 0.15; filter: grayscale(1); transform: scale(0.92); }
-        .guess-btn { background: var(--lego-red); color: white; border: none; padding: 6px; border-radius: 5px; cursor: pointer; font-size: 10px; font-weight: bold; width: 100%; }
+        /* Kafelki postaci */
+        .board { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; }
+        .card { background: #fff; border: 3px solid #ddd; border-radius: 10px; padding: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.2s; position: relative; }
+        .card img { width: 100%; height: 140px; object-fit: contain; pointer-events: none; }
+        .card p { margin: 10px 0; font-size: 13px; font-weight: bold; pointer-events: none; min-height: 40px; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
+        .card.eliminated { opacity: 0.2; filter: grayscale(1); transform: scale(0.95); }
+        
+        .guess-btn { background: var(--lego-red); color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: bold; width: 100%; margin-top: auto; }
         
         .game-header { background: var(--lego-yellow); padding: 15px; border-radius: 12px; display: flex; justify-content: space-around; align-items: center; margin-bottom: 20px; border: 3px solid #ccac00; }
         
+        /* Overlay Wyniku */
         #result-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        #result-card { background: white; padding: 30px; border-radius: 20px; color: black; text-align: center; }
-        #result-img { width: 200px; height: 200px; object-fit: contain; }
+        #result-card { background: white; padding: 40px; border-radius: 20px; color: black; text-align: center; max-width: 400px; }
+        #result-img { width: 220px; height: 220px; object-fit: contain; margin: 20px 0; }
 
-        input { padding: 12px; font-size: 22px; border-radius: 8px; border: 3px solid var(--lego-blue); text-align: center; width: 220px; text-transform: uppercase; }
-        #room-display { font-size: 40px; color: var(--lego-blue); background: #f0f0f0; padding: 10px 20px; border-radius: 10px; display: inline-block; margin: 10px 0; border: 2px dashed #ccc; font-weight: bold; }
-        .back-link { margin-top: 20px; display: block; color: #666; cursor: pointer; text-decoration: underline; font-size: 14px; }
+        input { padding: 15px; font-size: 24px; border-radius: 10px; border: 4px solid var(--lego-blue); text-align: center; width: 250px; text-transform: uppercase; }
+        #room-display { font-size: 45px; color: var(--lego-blue); background: #f0f0f0; padding: 15px 30px; border-radius: 15px; display: inline-block; margin: 15px 0; border: 3px dashed #bbb; font-weight: bold; letter-spacing: 5px; }
+        .back-link { margin-top: 30px; display: inline-block; color: #444; cursor: pointer; font-weight: bold; text-decoration: underline; font-size: 16px; padding: 10px; }
     </style>
 </head>
 <body>
@@ -49,43 +51,43 @@
 
 <div class="container">
     <div id="s-main">
-        <h1 id="txt-title" style="color:var(--lego-red); -webkit-text-stroke: 1px black;">LEGO ZGADNIJ KTO TO</h1>
+        <h1 id="txt-title" style="color:var(--lego-red); font-size: 40px; -webkit-text-stroke: 1.5px black; margin-bottom: 40px;">LEGO ZGADNIJ KTO TO</h1>
         <button class="big-btn btn-blue" onclick="goHost()" id="txt-host">STWÓRZ POKÓJ</button><br>
         <button class="big-btn btn-green" onclick="showS('s-join')" id="txt-join">DOŁĄCZ DO GRY</button>
     </div>
 
     <div id="s-join" class="hidden">
         <h3 id="txt-inputCode">Wpisz kod pokoju:</h3>
-        <input type="text" id="join-id" placeholder="KOD..."><br><br>
-        <button class="big-btn btn-green" onclick="doJoin()" id="txt-connect">POŁĄCZ</button>
-        <span class="back-link" onclick="location.reload()" id="txt-back">Wstecz</span>
+        <input type="text" id="join-id" placeholder="..." maxlength="6"><br><br>
+        <button class="big-btn btn-green" onclick="doJoin()" id="txt-connect">POŁĄCZ</button><br>
+        <span class="back-link" onclick="location.reload()" id="txt-back">Wstecz / Back</span>
     </div>
 
     <div id="s-lobby" class="hidden">
         <p id="txt-yourCode">TWÓJ KOD POKOJU:</p>
         <div id="room-display">...</div>
-        <p id="wait-msg">Czekaj na kolegę...</p>
-        <div id="cat-list" class="hidden" style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px;"></div>
-        <span class="back-link" onclick="location.reload()" id="txt-back2">WYJDŹ / POWRÓT</span>
+        <p id="wait-msg" style="font-size: 18px; color: #555;">Czekaj na kolegę...</p>
+        <div id="cat-list" class="hidden" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; max-width: 900px; margin: 20px auto;"></div>
+        <span class="back-link" onclick="location.reload()" id="txt-back2">POWRÓT / EXIT</span>
     </div>
 
     <div id="s-game" class="hidden">
         <div class="game-header">
-            <div><span id="txt-youAre">TWOJA POSTAĆ:</span><br><strong id="my-char-name" style="font-size:18px; color:var(--lego-red);">?</strong></div>
-            <button onclick="location.reload()" id="txt-exit" class="btn-red" style="width:100px; padding:10px; font-size:12px; box-shadow:none;">WYJDŹ</button>
+            <div><span id="txt-youAre" style="font-size: 14px; opacity: 0.8;">TWOJA POSTAĆ:</span><br><strong id="my-char-name" style="font-size:22px; color:var(--lego-red);">?</strong></div>
+            <button onclick="location.reload()" id="txt-exit" class="btn-red" style="width:100px; padding:10px; font-size:12px; box-shadow:none; margin:0;">WYJDŹ</button>
         </div>
         <div id="game-board" class="board"></div>
     </div>
 </div>
 
 <div id="result-overlay" class="hidden">
-    <h1 id="res-title" style="font-size: 60px; -webkit-text-stroke: 2px black;">WYNIK</h1>
+    <h1 id="res-title" style="font-size: 70px; -webkit-text-stroke: 2px black;">WYNIK</h1>
     <div id="result-card">
-        <p id="txt-was">To był(a):</p>
-        <h2 id="result-char-name">Postać</h2>
-        <img id="result-img" src="">
-        <br><br>
-        <button class="big-btn btn-blue" id="txt-replay" onclick="location.reload()">ZAGRAJ PONOWNIE</button>
+        <p id="txt-was" style="font-size: 20px; margin: 0;">To był(a):</p>
+        <h2 id="result-char-name" style="font-size: 30px; margin: 10px 0; color: var(--lego-blue);">Postać</h2>
+        <img id="result-img" src="" onerror="this.src='https://via.placeholder.com/200?text=LEGO'">
+        <br>
+        <button class="big-btn btn-blue" id="txt-replay" onclick="location.reload()" style="width: 100%;">ZAGRAJ PONOWNIE</button>
     </div>
 </div>
 
@@ -95,18 +97,45 @@
     const IMG_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/img/`;
 
     const langData = {
-        pl: { title: "LEGO ZGADNIJ KTO TO", host: "STWÓRZ POKÓJ", join: "DOŁĄCZ DO GRY", inputCode: "Wpisz kod pokoju:", connect: "POŁĄCZ", yourCode: "TWÓJ KOD POKOJU:", wait: "Czekaj na kolegę...", youAre: "TWOJA POSTAĆ:", exit: "WYJDŹ", guess: "ZGADUJ!", mixed: "⭐ WSZYSTKO MIESZANE ⭐", win: "WYGRAŁEŚ!", lose: "PRZEGRAŁEŚ!", was: "To był(a):", replay: "ZAGRAJ PONOWNIE", back: "Wstecz", back2: "POWRÓT DO MENU", confirmG: "Czy na pewno zgadujesz: ", alertMiss: "Pudło! To nie ta postać.", alertJoin: "Gracz dołączył!", nextLang: "🇬🇧" },
-        en: { title: "LEGO GUESS WHO", host: "CREATE ROOM", join: "JOIN GAME", inputCode: "Enter room code:", connect: "CONNECT", yourCode: "YOUR ROOM CODE:", wait: "Waiting for player...", youAre: "YOUR CHARACTER:", exit: "EXIT", guess: "GUESS!", mixed: "⭐ ALL MIXED ⭐", win: "YOU WIN!", lose: "YOU LOSE!", was: "It was:", replay: "PLAY AGAIN", back: "Back", back2: "BACK TO MENU", confirmG: "Are you sure you guess: ", alertMiss: "Miss! That's not the character.", alertJoin: "Player joined!", nextLang: "🇵🇱" }
+        pl: { title: "LEGO ZGADNIJ KTO TO", host: "STWÓRZ POKÓJ", join: "DOŁĄCZ DO GRY", inputCode: "Wpisz kod pokoju:", connect: "POŁĄCZ", yourCode: "TWÓJ KOD POKOJU:", wait: "Gracz dołączył! Wybierz kategorię:", youAre: "TWOJA POSTAĆ:", exit: "WYJDŹ", guess: "ZGADUJ!", mixed: "⭐ WSZYSTKO MIESZANE ⭐", win: "WYGRAŁEŚ!", lose: "PRZEGRAŁEŚ!", was: "To był(a):", replay: "ZAGRAJ PONOWNIE", back: "Wstecz", back2: "POWRÓT DO MENU", confirmG: "Czy na pewno zgadujesz: ", alertMiss: "Pudło! To nie ta postać.", alertWait: "Czekaj na połączenie...", nextLang: "🇬🇧" },
+        en: { title: "LEGO GUESS WHO", host: "CREATE ROOM", join: "JOIN GAME", inputCode: "Enter room code:", connect: "CONNECT", yourCode: "YOUR ROOM CODE:", wait: "Player joined! Pick category:", youAre: "YOUR CHARACTER:", exit: "EXIT", guess: "GUESS!", mixed: "⭐ ALL MIXED ⭐", win: "YOU WIN!", lose: "YOU LOSE!", was: "It was:", replay: "PLAY AGAIN", back: "Back", back2: "BACK TO MENU", confirmG: "Are you sure you guess: ", alertMiss: "Miss! That's not the character.", alertWait: "Waiting for connection...", nextLang: "🇵🇱" }
     };
     
     let curL = 'pl';
     let peer, conn, myChar, boardData, isHost = false;
 
-    // Baza postaci (fragment)
+    // --- PEŁNA BAZA 14 KATEGORII ---
     const db = {
-        "STAR WARS": [{n:"Darth Vader", img:"vader.jpg"}, {n:"Mistrz Yoda", img:"yoda.jpg"}, {n:"Luke Skywalker", img:"luke.jpg"}, {n:"R2-D2", img:"r2d2.jpg"}, {n:"Chewbacca", img:"chewie.jpg"}, {n:"Han Solo", img:"han.jpg"}, {n:"Księżniczka Leia", img:"leia.jpg"}, {n:"C-3PO", img:"c3po.jpg"}, {n:"Boba Fett", img:"boba.jpg"}, {n:"Szturmowiec Imperium", img:"storm.jpg"}],
-        "MARVEL": [{n:"Iron Man (Tony Stark)", img:"ironman.jpg"}, {n:"Spider-Man (Peter Parker)", img:"spiderman.jpg"}, {n:"Kapitan Ameryka", img:"cap.jpg"}, {n:"Thor Odinson", img:"thor.jpg"}, {n:"Hulk (Bruce Banner)", img:"hulk.jpg"}, {n:"Czarna Wdowa", img:"widow.jpg"}, {n:"Thanos", img:"thanos.jpg"}, {n:"Doktor Strange", img:"strange.jpg"}],
-        "HARRY POTTER": [{n:"Harry Potter", img:"harry.jpg"}, {n:"Ron Weasley", img:"ron.jpg"}, {n:"Hermiona Granger", img:"hermiona.jpg"}, {n:"Albus Dumbledore", img:"dumbledore.jpg"}, {n:"Lord Voldemort", img:"voldemort.jpg"}, {n:"Severus Snape", img:"snape.jpg"}, {n:"Rubeus Hagrid", img:"hagrid.jpg"}, {n:"Draco Malfoy", img:"draco.jpg"}]
+        "STAR WARS": [
+            {n:"Darth Vader", img:"vader.jpg"}, {n:"Mistrz Yoda", img:"yoda.jpg"}, {n:"Luke Skywalker", img:"luke.jpg"}, {n:"R2-D2", img:"r2d2.jpg"}, {n:"Chewbacca", img:"chewie.jpg"}, {n:"Han Solo", img:"han.jpg"}, {n:"Księżniczka Leia", img:"leia.jpg"}, {n:"C-3PO", img:"c3po.jpg"}, {n:"Boba Fett", img:"boba.jpg"}, {n:"Szturmowiec", img:"storm.jpg"}, {n:"Kylo Ren", img:"kylo.jpg"}, {n:"Rey Skywalker", img:"rey.jpg"}, {n:"Darth Maul", img:"maul.jpg"}, {n:"Ahsoka Tano", img:"ahsoka.jpg"}, {n:"Obi-Wan Kenobi", img:"obi.jpg"}, {n:"Anakin Skywalker", img:"anakin.jpg"}, {n:"Imperator Palpatine", img:"palp.jpg"}, {n:"Din Djarin (Mando)", img:"mando.jpg"}, {n:"Grogu", img:"grogu.jpg"}, {n:"Admirał Ackbar", img:"ackbar.jpg"}, {n:"Generał Grievous", img:"grievous.jpg"}, {n:"Hrabia Dooku", img:"dooku.jpg"}, {n:"Lando Calrissian", img:"lando.jpg"}, {n:"Mace Windu", img:"windu.jpg"}, {n:"Kit Fisto", img:"kit.jpg"}, {n:"Jabba the Hutt", img:"jabba.jpg"}, {n:"Qui-Gon Jinn", img:"quigon.jpg"}, {n:"Jango Fett", img:"jango.jpg"}, {n:"Poe Dameron", img:"poe.jpg"}, {n:"Wicket", img:"wicket.jpg"}
+        ],
+        "MARVEL": [
+            {n:"Iron Man", img:"ironman.jpg"}, {n:"Spider-Man", img:"spiderman.jpg"}, {n:"Kapitan Ameryka", img:"cap.jpg"}, {n:"Thor Odinson", img:"thor.jpg"}, {n:"Hulk", img:"hulk.jpg"}, {n:"Czarna Wdowa", img:"widow.jpg"}, {n:"Thanos", img:"thanos.jpg"}, {n:"Czarna Pantera", img:"panther.jpg"}, {n:"Doktor Strange", img:"strange.jpg"}, {n:"Groot", img:"groot.jpg"}, {n:"Rocket Raccoon", img:"rocket.jpg"}, {n:"Ant-Man", img:"antman.jpg"}, {n:"Wolverine", img:"wolvie.jpg"}, {n:"Deadpool", img:"deadpool.jpg"}, {n:"Venom", img:"venom.jpg"}, {n:"Loki", img:"loki.jpg"}, {n:"Daredevil", img:"daredevil.jpg"}, {n:"Magneto", img:"magneto.jpg"}, {n:"Scarlet Witch", img:"witch.jpg"}, {n:"Star-Lord", img:"starlord.jpg"}, {n:"Nick Fury", img:"fury.jpg"}, {n:"Vision", img:"vision.jpg"}, {n:"Hawkeye", img:"hawkeye.jpg"}, {n:"Zimowy Żołnierz", img:"bucky.jpg"}, {n:"Falcon", img:"falcon.jpg"}, {n:"Gamora", img:"gamora.jpg"}, {n:"Drax", img:"drax.jpg"}, {n:"Punisher", img:"punisher.jpg"}, {n:"Carnage", img:"carnage.jpg"}, {n:"Ghost Rider", img:"ghost.jpg"}
+        ],
+        "BATMAN / DC": [
+            {n:"Batman", img:"batman.jpg"}, {n:"Joker", img:"joker.jpg"}, {n:"Robin", img:"robin.jpg"}, {n:"Harley Quinn", img:"harley.jpg"}, {n:"Bane", img:"bane.jpg"}, {n:"Batgirl", img:"batgirl.jpg"}, {n:"Dwie Twarze", img:"twoface.jpg"}, {n:"Pingwin", img:"penguin.jpg"}, {n:"Człowiek Zagadka", img:"riddler.jpg"}, {n:"Kobieta Kot", img:"catwoman.jpg"}, {n:"Trujący Bluszcz", img:"ivy.jpg"}, {n:"Strach na Wróble", img:"scarecrow.jpg"}, {n:"Superman", img:"superman.jpg"}, {n:"Wonder Woman", img:"ww.jpg"}, {n:"Flash", img:"flash.jpg"}, {n:"Aquaman", img:"aquaman.jpg"}, {n:"Lex Luthor", img:"luthor.jpg"}, {n:"Nightwing", img:"nightwing.jpg"}, {n:"Alfred Pennyworth", img:"alfred.jpg"}, {n:"Komisarz Gordon", img:"gordon.jpg"}, {n:"Killer Croc", img:"croc.jpg"}, {n:"Mr. Freeze", img:"freeze.jpg"}, {n:"Zatanna", img:"zatanna.jpg"}, {n:"Darkseid", img:"darkseid.jpg"}, {n:"Brainiac", img:"brainiac.jpg"}, {n:"Cyborg", img:"cyborg.jpg"}, {n:"Green Lantern", img:"gl.jpg"}, {n:"Shazam", img:"shazam.jpg"}, {n:"Black Adam", img:"blackadam.jpg"}, {n:"Doomsday", img:"doomsday.jpg"}
+        ],
+        "HARRY POTTER": [
+            {n:"Harry Potter", img:"harry.jpg"}, {n:"Ron Weasley", img:"ron.jpg"}, {n:"Hermiona Granger", img:"hermiona.jpg"}, {n:"Albus Dumbledore", img:"dumbledore.jpg"}, {n:"Lord Voldemort", img:"voldemort.jpg"}, {n:"Severus Snape", img:"snape.jpg"}, {n:"Rubeus Hagrid", img:"hagrid.jpg"}, {n:"Draco Malfoy", img:"draco.jpg"}, {n:"Zgredek", img:"dobby.jpg"}, {n:"Bellatrix Lestrange", img:"bellatrix.jpg"}, {n:"Sirius Black", img:"sirius.jpg"}, {n:"Luna Lovegood", img:"luna.jpg"}, {n:"Neville Longbottom", img:"neville.jpg"}, {n:"Ginny Weasley", img:"ginny.jpg"}, {n:"Remus Lupin", img:"lupin.jpg"}, {n:"Minerwa McGonagall", img:"mcgonagall.jpg"}, {n:"Alastor Moody", img:"madeye.jpg"}, {n:"Cedrik Diggory", img:"cedric.jpg"}, {n:"Lucius Malfoy", img:"lucius.jpg"}, {n:"Cho Chang", img:"cho.jpg"}, {n:"Fred Weasley", img:"fred.jpg"}, {n:"George Weasley", img:"george.jpg"}, {n:"Dolores Umbridge", img:"umbridge.jpg"}, {n:"Viktor Krum", img:"krum.jpg"}, {n:"Fleur Delacour", img:"fleur.jpg"}, {n:"Argus Filch", img:"filch.jpg"}, {n:"Gilderoy Lockhart", img:"gilderoy.jpg"}, {n:"Narcyza Malfoy", img:"narcissa.jpg"}, {n:"Sybiila Trelawney", img:"trelawney.jpg"}, {n:"James Potter", img:"james.jpg"}
+        ],
+        "NINJAGO": [
+            {n:"Kai", img:"kai.jpg"}, {n:"Jay", img:"jay.jpg"}, {n:"Zane", img:"zane.jpg"}, {n:"Cole", img:"cole.jpg"}, {n:"Lloyd", img:"lloyd.jpg"}, {n:"Nya", img:"nya.jpg"}, {n:"Mistrz Wu", img:"wu.jpg"}, {n:"Lord Garmadon", img:"garmadon.jpg"}, {n:"Pythor", img:"pythor.jpg"}, {n:"Dareth", img:"dareth.jpg"}, {n:"Skylor", img:"skylor.jpg"}, {n:"Morro", img:"morro.jpg"}, {n:"Mistrz Chen", img:"chen.jpg"}, {n:"Nadakhan", img:"nadakhan.jpg"}, {n:"Harumi", img:"harumi.jpg"}, {n:"Piksel", img:"pixal.jpg"}, {n:"Misako", img:"misako.jpg"}, {n:"Kryptor", img:"kryptor.jpg"}, {n:"Mindroid", img:"mindroid.jpg"}, {n:"Overlord", img:"overlord.jpg"}, {n:"Samuraj X", img:"samuraix.jpg"}, {n:"Aspheera", img:"aspheera.jpg"}, {n:"Vangelis", img:"vangelis.jpg"}, {n:"Unagami", img:"unagami.jpg"}, {n:"Kalmaar", img:"kalmaar.jpg"}, {n:"Mr. E", img:"mre.jpg"}, {n:"General Kozu", img:"kozu.jpg"}, {n:"Killow", img:"killow.jpg"}, {n:"Ultra Violet", img:"uv.jpg"}, {n:"Borg", img:"borg.jpg"}
+        ],
+        "CITY": [
+            {n:"Policjant Chase", img:"chase.jpg"}, {n:"Złodziej Rex", img:"rex.jpg"}, {n:"Strażak Tom", img:"straza.jpg"}, {n:"Pilot Helikoptera", img:"pilot.jpg"}, {n:"Nurek", img:"nurek.jpg"}, {n:"Robotnik drogowy", img:"budowa.jpg"}, {n:"Śmieciarz", img:"smieciarz.jpg"}, {n:"Lekarz Pogotowia", img:"lekarz.jpg"}, {n:"Pani Burmistrz", img:"mayor.jpg"}, {n:"Dziennikarka", img:"press.jpg"}, {n:"Astronauta", img:"astro.jpg"}, {n:"Rowerzysta", img:"rower.jpg"}, {n:"Kucharz Pizzy", img:"pizza.jpg"}, {n:"Listonosz", img:"poczta.jpg"}, {n:"Mechanik", img:"mechanik.jpg"}, {n:"Pasażer Pociągu", img:"pasazer.jpg"}, {n:"Turysta", img:"turysta.jpg"}, {n:"Rybak", img:"rybak.jpg"}, {n:"Ratownik", img:"ratownik.jpg"}, {n:"Narciarz", img:"narciarz.jpg"}, {n:"Skater", img:"skater.jpg"}, {n:"Kierowca Autobusu", img:"autobus.jpg"}, {n:"Pani Naukowiec", img:"nauka.jpg"}, {n:"Górnik", img:"gornik.jpg"}, {n:"Leśniczy", img:"las.jpg"}, {n:"Złodziejka", img:"zlodziejka.jpg"}, {n:"Kapitan Statku", img:"statek.jpg"}, {n:"Hokeista", img:"hokej.jpg"}, {n:"Pływak", img:"plywak.jpg"}, {n:"Fotograf", img:"foto.jpg"}
+        ],
+        "CASTLE / RYCERSKA": [
+            {n:"Król", img:"krol.jpg"}, {n:"Królowa", img:"krolowa.jpg"}, {n:"Czarny Rycerz", img:"brycerz.jpg"}, {n:"Biały Rycerz", img:"wrycerz.jpg"}, {n:"Czarodziej", img:"wizard.jpg"}, {n:"Smok", img:"smok.jpg"}, {n:"Szkielet", img:"szkielet.jpg"}, {n:"Błazen", img:"blazen.jpg"}, {n:"Łucznik", img:"lucznik.jpg"}, {n:"Kowal", img:"kowal.jpg"}, {n:"Księżniczka", img:"princess.jpg"}, {n:"Duch", img:"duch.jpg"}, {n:"Troll", img:"troll.jpg"}, {n:"Ork", img:"ork.jpg"}, {n:"Rycerz Lwa", img:"lew.jpg"}, {n:"Rycerz Sokoła", img:"sokol.jpg"}, {n:"Giermek", img:"giermek.jpg"}, {n:"Bartłomiej", img:"bart.jpg"}, {n:"Pustelnik", img:"pustelnik.jpg"}, {n:"Strażnik Wieży", img:"straznik.jpg"}, {n:"Krasnolud", img:"krasnal.jpg"}, {n:"Wiedźma", img:"wiedzma.jpg"}, {n:"Goblina", img:"goblin.jpg"}, {n:"Zabójca Smoków", img:"slayer.jpg"}, {n:"Herold", img:"herold.jpg"}, {n:"Karczmarz", img:"karczmarz.jpg"}, {n:"Mieszczanin", img:"mieszczanin.jpg"}, {n:"Zbrojmistrz", img:"zbroja.jpg"}, {n:"Więzień", img:"wiezien.jpg"}, {n:"Szlachcic", img:"szlachcic.jpg"}
+        ],
+        "PIRATES / PIRACI": [
+            {n:"Kapitan Rudobrody", img:"beard.jpg"}, {n:"Bosman", img:"bosman.jpg"}, {n:"Marynarz", img:"marynarz.jpg"}, {n:"Admirał", img:"admiral.jpg"}, {n:"Gubernator", img:"gubernator.jpg"}, {n:"Córka Gubernatora", img:"corka.jpg"}, {n:"Pirat z Opaską", img:"opaska.jpg"}, {n:"Pirat z Drewnianą Nogą", img:"noga.jpg"}, {n:"Papuga", img:"papuga.jpg"}, {n:"Małpka", img:"malpa.jpg"}, {n:"Żołnierz", img:"zolnierz.jpg"}, {n:"Pani Kapitan", img:"pkapitan.jpg"}, {n:"Rozbitek", img:"rozbitek.jpg"}, {n:"Kanibal", img:"kanibal.jpg"}, {n:"Kucharz okrętowy", img:"kucharz.jpg"}, {n:"Szkielet Pirata", img:"pszkielet.jpg"}, {n:"Pirat z Hakem", img:"hak.jpg"}, {n:"Syrena", img:"syrena.jpg"}, {n:"Oficer Królewski", img:"oficer.jpg"}, {n:"Rekin", img:"rekin.jpg"}, {n:"Korsarz", img:"korsarz.jpg"}, {n:"Handlarz", img:"handlarz.jpg"}, {n:"Strażnik Portu", img:"port.jpg"}, {n:"Zwiadowca", img:"zwiadowca.jpg"}, {n:"Pirat Muzyk", img:"muzyk.jpg"}, {n:"Działonowy", img:"dzialo.jpg"}, {n:"Bukanier", img:"bukanier.jpg"}, {n:"Szuler", img:"szuler.jpg"}, {n:"Legionista", img:"legion.jpg"}, {n:"Więzień Fortu", img:"fort.jpg"}
+        ],
+        "SPACE / KOSMOS": [{n:"Classic Space Blue", img:"sblue.jpg"}, {n:"Classic Space Red", img:"sred.jpg"}, {n:"Classic Space White", img:"swhite.jpg"}, {n:"Classic Space Yellow", img:"syellow.jpg"}, {n:"Blacktron Pilot", img:"blacktron.jpg"}, {n:"M-Tron Engineer", img:"mtron.jpg"}, {n:"Space Police", img:"spolice.jpg"}, {n:"Ice Planet Explorer", img:"iceplanet.jpg"}, {n:"Alien Lifeform", img:"alien.jpg"}, {n:"Robot Helper", img:"helper.jpg"}, {n:"Galaxy Commander", img:"gcommander.jpg"}, {n:"Unitron Pilot", img:"unitron.jpg"}, {n:"Explorien", img:"explorien.jpg"}, {n:"Insectoid", img:"insectoid.jpg"}, {n:"Life on Mars Alien", img:"mars.jpg"}, {n:"UFO Pilot", img:"ufo.jpg"}, {n:"Star Justice", img:"justice.jpg"}, {n:"Alien Villain", img:"villain.jpg"}, {n:"Cyborg Astronaut", img:"castro.jpg"}, {n:"Moon Miner", img:"miner.jpg"}, {n:"Solar Explorer", img:"solar.jpg"}, {n:"Deep Space Pilot", img:"deep.jpg"}, {n:"Nova Ranger", img:"nova.jpg"}, {n:"Cosmic Queen", img:"cqueen.jpg"}, {n:"Droid Pilot", img:"dpilot.jpg"}, {n:"Nebula Traveler", img:"nebula.jpg"}, {n:"Void Scout", img:"void.jpg"}, {n:"Ranger 7", img:"r7.jpg"}, {n:"Mecha Pilot", img:"mecha.jpg"}, {n:"Warp Driver", img:"warp.jpg"}],
+        "TECHNIC": [{n:"Kierowca Wyścigowy", img:"tdrive.jpg"}, {n:"Inżynier", img:"eng.jpg"}, {n:"Mechanik Technic", img:"tmech.jpg"}, {n:"Kierowca Ciężarówki", img:"truck.jpg"}, {n:"Operator Koparki", img:"dig.jpg"}, {n:"Pilot Odrzutowca", img:"jet.jpg"}, {n:"Kaskader", img:"stunt.jpg"}, {n:"Tester Bolidów", img:"test.jpg"}, {n:"Sędzia Wyścigowy", img:"sedzia.jpg"}, {n:"Kierowca Traktora", img:"traktor.jpg"}, {n:"Operator Żurawia", img:"zuraw.jpg"}, {n:"Kierowca Quada", img:"quad.jpg"}, {n:"Motocyklista", img:"moto.jpg"}, {n:"Kierowca Buggy", img:"buggy.jpg"}, {n:"Pilot Śmigłowca", img:"heli.jpg"}, {n:"Mechanik Pit-Stop", img:"pit.jpg"}, {n:"Ratownik Technic", img:"trescue.jpg"}, {n:"Kierowca Monster Trucka", img:"monster.jpg"}, {n:"Logistyk", img:"log.jpg"}, {n:"Kierowca Lawety", img:"laweta.jpg"}, {n:"Marynarz Technic", img:"sailor.jpg"}, {n:"Ekspert Hydrauliki", img:"hydro.jpg"}, {n:"Specjalista Pneumatyki", img:"pneu.jpg"}, {n:"Konstruktor", img:"konst.jpg"}, {n:"Kierowca Rally", img:"rally.jpg"}, {n:"Projektant", img:"proj.jpg"}, {n:"Kierowca Gokarta", img:"gokart.jpg"}, {n:"Główny Mechanik", img:"head.jpg"}, {n:"Zastępca", img:"dep.jpg"}, {n:"Praktykant", img:"intern.jpg"}],
+        "FRIENDS": [{n:"Olivia", img:"olivia.jpg"}, {n:"Mia", img:"mia.jpg"}, {n:"Stephanie", img:"steph.jpg"}, {n:"Emma", img:"emma.jpg"}, {n:"Andrea", img:"andrea.jpg"}, {n:"Livi", img:"livi.jpg"}, {n:"Matthew", img:"matt.jpg"}, {n:"Zack", img:"zack.jpg"}, {n:"Aliya", img:"aliya.jpg"}, {n:"Autumn", img:"autumn.jpg"}, {n:"Leo", img:"leo.jpg"}, {n:"Nova", img:"fnova.jpg"}, {n:"Paisley", img:"paisley.jpg"}, {n:"Olly", img:"olly.jpg"}, {n:"Lianne", img:"lianne.jpg"}, {n:"Zac", img:"zac.jpg"}, {n:"Maya", img:"fmaya.jpg"}, {n:"River", img:"river.jpg"}, {n:"Eitan", img:"eitan.jpg"}, {n:"Chloe", img:"chloe.jpg"}, {n:"Dr. Maria", img:"maria.jpg"}, {n:"Pani Stevens", img:"stevens.jpg"}, {n:"Peter", img:"peter.jpg"}, {n:"Sophie", img:"sophie.jpg"}, {n:"Joy", img:"joy.jpg"}, {n:"Daniel", img:"daniel.jpg"}, {n:"Henry", img:"henry.jpg"}, {n:"Julian", img:"julian.jpg"}, {n:"Ethan", img:"ethan.jpg"}, {n:"Sky", img:"sky.jpg"}],
+        "NEXO KNIGHTS": [{n:"Clay Moorington", img:"clay.jpg"}, {n:"Macy Halbert", img:"macy.jpg"}, {n:"Aaron Fox", img:"aaron.jpg"}, {n:"Lance Richmond", img:"lance.jpg"}, {n:"Axl", img:"axl.jpg"}, {n:"Jestro", img:"jestro.jpg"}, {n:"Merlok 2.0", img:"merlok.jpg"}, {n:"Monstrox", img:"monstrox.jpg"}, {n:"Król Halbert", img:"khalbert.jpg"}, {n:"Ava Prentis", img:"ava.jpg"}, {n:"Robin Underwood", img:"robinu.jpg"}, {n:"Lavaria", img:"lavaria.jpg"}, {n:"Moltor", img:"moltor.jpg"}, {n:"Flama", img:"flama.jpg"}, {n:"General Magmar", img:"magmar.jpg"}, {n:"Burnzie", img:"burnzie.jpg"}, {n:"Rogul", img:"rogul.jpg"}, {n:"Ruina", img:"ruina.jpg"}, {n:"Garg", img:"garg.jpg"}, {n:"Grimroc", img:"grimroc.jpg"}, {n:"Herc", img:"herc.jpg"}, {n:"Brick", img:"brick.jpg"}, {n:"Scurrier", img:"scurrier.jpg"}, {n:"Globlin", img:"globlin.jpg"}, {n:"Beast Master", img:"beast.jpg"}, {n:"Whiparella", img:"whip.jpg"}, {n:"Fluttermouth", img:"flutter.jpg"}, {n:"Quake Beast", img:"quake.jpg"}, {n:"Stone Stomper", img:"stomper.jpg"}, {n:"Lance Bot", img:"lbot.jpg"}],
+        "BIONICLE": [{n:"Tahu", img:"tahu.jpg"}, {n:"Kopaka", img:"kopaka.jpg"}, {n:"Onua", img:"onua.jpg"}, {n:"Gali", img:"gali.jpg"}, {n:"Lewa", img:"lewa.jpg"}, {n:"Pohatu", img:"pohatu.jpg"}, {n:"Makuta", img:"makuta.jpg"}, {n:"Mata Nui", img:"matanui.jpg"}, {n:"Vakama", img:"vakama.jpg"}, {n:"Nokama", img:"nokama.jpg"}, {n:"Matau", img:"matau.jpg"}, {n:"Onewa", img:"onewa.jpg"}, {n:"Whenua", img:"whenua.jpg"}, {n:"Nuju", img:"nuju.jpg"}, {n:"Jaller", img:"jaller.jpg"}, {n:"Hahli", img:"hahli.jpg"}, {n:"Matoro", img:"matoro.jpg"}, {n:"Kongu", img:"kongu.jpg"}, {n:"Hewkii", img:"hewkii.jpg"}, {n:"Nuparu", img:"nuparu.jpg"}, {n:"Vezon", img:"vezon.jpg"}, {n:"Brutaka", img:"brutaka.jpg"}, {n:"Axonn", img:"axonn.jpg"}, {n:"Roodaka", img:"roodaka.jpg"}, {n:"Sidorak", img:"sidorak.jpg"}, {n:"Keetongu", img:"keetongu.jpg"}, {n:"Takadox", img:"takadox.jpg"}, {n:"Ehlek", img:"ehlek.jpg"}, {n:"Pridak", img:"pridak.jpg"}, {n:"Mantax", img:"mantax.jpg"}],
+        "LORD OF THE RINGS": [{n:"Frodo Baggins", img:"frodo.jpg"}, {n:"Gandalf Szary", img:"gandalf.jpg"}, {n:"Aragorn", img:"aragorn.jpg"}, {n:"Legolas", img:"legolas.jpg"}, {n:"Gimli", img:"gimli.jpg"}, {n:"Samwise Gamgee", img:"sam.jpg"}, {n:"Boromir", img:"boromir.jpg"}, {n:"Gollum", img:"gollum.jpg"}, {n:"Sauron", img:"sauron.jpg"}, {n:"Saruman", img:"saruman.jpg"}, {n:"Pippin", img:"pippin.jpg"}, {n:"Merry", img:"merry.jpg"}, {n:"Arwena", img:"arwen.jpg"}, {n:"Elrond", img:"elrond.jpg"}, {n:"Galadriela", img:"galadriel.jpg"}, {n:"Eomer", img:"eomer.jpg"}, {n:"Theoden", img:"theoden.jpg"}, {n:"Eowina", img:"eowyn.jpg"}, {n:"Faramir", img:"faramir.jpg"}, {n:"Nazgul", img:"nazgul.jpg"}, {n:"Uruk-hai", img:"uruk.jpg"}, {n:"Orc Soldier", img:"orc.jpg"}, {n:"Bilbo Baggins", img:"bilbo.jpg"}, {n:"Radagast", img:"radagast.jpg"}, {n:"Tauriela", img:"tauriel.jpg"}, {n:"Bard", img:"bard.jpg"}, {n:"Thranduil", img:"thranduil.jpg"}, {n:"Balrog", img:"balrog.jpg"}, {n:"Witch King", img:"wking.jpg"}, {n:"Grima", img:"grima.jpg"}]
     };
 
     function toggleLanguage() {
@@ -122,7 +151,7 @@
         document.getElementById('txt-join').innerText = L.join;
         document.getElementById('txt-inputCode').innerText = L.inputCode;
         document.getElementById('txt-connect').innerText = L.connect;
-        document.getElementById('txt-back').innerText = L.back;
+        document.getElementById('txt-back').innerText = L.back + " / Back";
         document.getElementById('txt-back2').innerText = L.back2;
         document.getElementById('txt-yourCode').innerText = L.yourCode;
         document.getElementById('txt-youAre').innerText = L.youAre;
@@ -130,8 +159,10 @@
         document.getElementById('txt-was').innerText = L.was;
         document.getElementById('txt-replay').innerText = L.replay;
         
-        if(isHost && !document.getElementById('cat-list').classList.contains('hidden')) renderCatList();
-        document.querySelectorAll('.guess-btn').forEach(btn => btn.innerText = L.guess);
+        if(isHost && !document.getElementById('cat-list').classList.contains('hidden')) {
+            document.getElementById('wait-msg').innerText = L.wait;
+            renderCatList();
+        }
     }
 
     function showS(id) {
@@ -147,7 +178,7 @@
         peer = new Peer(sid);
         peer.on('connection', c => {
             conn = c;
-            document.getElementById('wait-msg').innerText = langData[curL].alertJoin;
+            document.getElementById('wait-msg').innerText = langData[curL].wait;
             document.getElementById('cat-list').classList.remove('hidden');
             renderCatList();
             setupConn();
@@ -169,6 +200,7 @@
     function doJoin() {
         const id = document.getElementById('join-id').value.toUpperCase();
         if(!id) return;
+        document.getElementById('txt-connect').innerText = langData[curL].alertWait;
         peer = new Peer();
         peer.on('open', () => {
             conn = peer.connect(id);
@@ -180,7 +212,7 @@
         conn.on('data', data => {
             if(data.type === 'START') { boardData = data.pool; myChar = data.yourChar; renderGame(); }
             if(data.type === 'GUESS') {
-                if(confirm((curL === 'pl' ? "Czy Twoja postać to: " : "Is your character: ") + data.name + "?")) {
+                if(confirm((curL === 'pl' ? "Przeciwnik pyta, czy masz postać: " : "Opponent asks if you have: ") + data.name + "?")) {
                     if(data.name === myChar.n) {
                         conn.send({type: 'RESULT', status: 'WIN', char: myChar});
                         showFinalResult('LOSE', myChar);
@@ -193,13 +225,20 @@
 
     function hStart(cat) {
         let pool = [];
-        if(cat === 'MIXED') Object.values(db).forEach(v => pool = pool.concat(v));
-        else pool = db[cat];
+        if(cat === 'MIXED') {
+            Object.values(db).forEach(v => pool = pool.concat(v));
+        } else {
+            pool = db[cat];
+        }
+        
+        // Losowanie 30 unikalnych postaci
         let shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, 30);
         const hChar = shuffled[Math.floor(Math.random()*30)];
         const gChar = shuffled[Math.floor(Math.random()*30)];
+        
         conn.send({ type: 'START', pool: shuffled, yourChar: hChar });
-        boardData = shuffled; myChar = gChar; renderGame();
+        boardData = shuffled; myChar = gChar; 
+        renderGame();
     }
 
     function renderGame() {
@@ -210,15 +249,22 @@
         boardData.forEach(p => {
             const card = document.createElement('div');
             card.className = 'card';
-            card.innerHTML = `<img src="${IMG_BASE + p.img}" onerror="this.src='https://via.placeholder.com/150/ffd500/000000?text=LEGO'"><p>${p.n}</p><button class="guess-btn" onclick="makeGuess('${p.n}', event)">${langData[curL].guess}</button>`;
+            card.innerHTML = `
+                <img src="${IMG_BASE + p.img}" onerror="this.src='https://via.placeholder.com/150/ffd500/000000?text=LEGO'">
+                <p>${p.n}</p>
+                <button class="guess-btn" onclick="makeGuess('${p.n}', event)">${langData[curL].guess}</button>
+            `;
             card.onclick = () => card.classList.toggle('eliminated');
             b.appendChild(card);
         });
+        document.querySelectorAll('.guess-btn').forEach(btn => btn.innerText = langData[curL].guess);
     }
 
     function makeGuess(name, event) {
         event.stopPropagation();
-        if(confirm(langData[curL].confirmG + name + "?")) conn.send({type: 'GUESS', name: name});
+        if(confirm(langData[curL].confirmG + name + "?")) {
+            conn.send({type: 'GUESS', name: name});
+        }
     }
 
     function showFinalResult(status, character) {
@@ -230,7 +276,6 @@
         document.getElementById('result-img').src = IMG_BASE + character.img;
     }
     
-    // Inicjalizacja napisów
     updateUI();
 </script>
 </body>
