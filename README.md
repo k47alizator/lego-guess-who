@@ -29,9 +29,11 @@ Witaj w cyfrowej wersji klasycznej gry "Zgadnij kto to", ale w całości zbudowa
 
 ---
 
-<small>### 🛠️ Autorzy
-* **Pomysłodawca i Właściciel:** k47alizator
-* **Kod i Logika:** Stworzone przy wsparciu AI (Gemini) jako inteligentny partner programistyczny.</small>
+<sub>
+<strong>Autorzy:</strong><br>
+• Pomysłodawca i Właściciel: k47alizator<br>
+• Kod i Logika: Stworzone przy wsparciu AI (Gemini)
+</sub>
 
 ---
 
