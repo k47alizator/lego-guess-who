@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LEGO Zgadnij Kto To!</title>
     <style>
+        /* Twoje dotychczasowe style */
         body { 
             font-family: 'Segoe UI', sans-serif; 
             background: #1a1a1a; 
@@ -45,41 +46,84 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.5); 
         }
         .card.hidden { opacity: 0.15; filter: grayscale(100%) brightness(50%); }
+
+        /* NOWE STYLE DLA PRZYCISKÓW KATEGORII I LOBBY */
+        .cat-btn {
+            padding: 12px 18px;
+            background: #444;
+            color: white;
+            border: 2px solid #555;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            min-width: 140px;
+        }
+
+        .cat-btn:hover {
+            background: #00ff00;
+            color: black;
+            transform: scale(1.05);
+            border-color: white;
+        }
+
+        @media (max-width: 600px) {
+            #setup-view {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+        }
     </style>
 </head>
 <body>
 
     <h1>LEGO Zgadnij Kto To!</h1>
 
-    <div id="menu">
-        <button onclick="initGame('LEGO STAR WARS')">Star Wars</button>
-        <button onclick="initGame('LEGO MARVEL / AVENGERS')">Marvel</button>
-        <button onclick="initGame('LEGO HARRY POTTER')">Harry Potter</button>
-        <button onclick="initGame('LEGO BATMAN (1-3)')">Batman</button>
-        <button onclick="initGame('LEGO LOTR / HOBBIT')">LOTR</button>
-        <button onclick="initGame('LEGO CITY UNDERCOVER')">City</button>
-        <button onclick="initGame('LEGO INDIANA JONES')">Indiana Jones</button>
-        <button onclick="initGame('LEGO PIRACI Z KARAIBÓW')">Piraci</button>
-        <button onclick="initGame('LEGO JURASSIC WORLD')">Jurassic World</button>
-        <button onclick="initGame('LEGO PRZYGODA (1 i 2)')">Przygoda</button>
-        <button onclick="initGame('LEGO NINJAGO')">Ninjago</button>
-        <button onclick="initGame('LEGO DIMENSIONS')">Dimensions</button>
-        <hr>
-    <button onclick="initGame('MIX')" style="background: orange; color: black; font-weight: bold;">TRYB MIX</button>
+   <div id="menu" style="text-align: center; font-family: sans-serif; padding: 20px;">
+    <h1 style="color: #ffcc00; text-shadow: 2px 2px black; font-size: 3em; margin-bottom: 10px;">LEGO GUESS WHO</h1>
 
-   <div style="margin-top: 20px; padding: 20px; border: 3px solid #ffcc00; border-radius: 15px; background: #2a2a2a; max-width: 500px; margin-left: auto; margin-right: auto;">
-    <p id="room-status" style="margin: 0 0 10px 0; color: #ffcc00; font-weight: bold; font-size: 18px;">USTAW POKÓJ DO GRY</p>
-    
-    <input type="text" id="room-input" oninput="updateRoomStatus()" placeholder="Wpisz dowolny kod (np. 123)" 
-           style="padding: 12px; border-radius: 8px; border: none; width: 90%; text-align: center; font-size: 20px; background: #fff; color: black; font-weight: bold; text-transform: uppercase;">
-
-    <div id="share-section" style="display: none; margin-top: 15px; border-top: 1px solid #444; padding-top: 15px;">
-        <p style="color: #00ff00; margin: 5px 0; font-size: 14px;">✓ Pokój aktywny!</p>
-        <div style="background: #444; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
-            <span style="font-size: 12px; color: #bbb;">TWÓJ KOD DLA ZNAJOMEGO:</span><br>
-            <strong id="display-code" style="font-size: 24px; color: white; letter-spacing: 2px;">---</strong>
+    <div id="setup-view" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 30px;">
+        
+        <div style="background: #2a2a2a; padding: 25px; border: 3px solid #0088ff; border-radius: 20px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+            <h3 style="color: #0088ff; margin-top: 0;">STWÓRZ GRĘ</h3>
+            <p style="font-size: 14px; color: #bbb; min-height: 40px;">Wybierz tę opcję, aby wygenerować nowy kod dla siebie i znajomego.</p>
+            <button onclick="createGame()" style="background: #0088ff; color: white; width: 100%; font-size: 18px; padding: 15px; border-radius: 10px; cursor: pointer; border: none; font-weight: bold;">GENERUJ KOD</button>
         </div>
-        <button onclick="copyRoomLink()" style="background: #0088ff; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;">Skopiuj link (opcjonalnie)</button>
+
+        <div style="background: #2a2a2a; padding: 25px; border: 3px solid #ffcc00; border-radius: 20px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+            <h3 style="color: #ffcc00; margin-top: 0;">DOŁĄCZ DO GRY</h3>
+            <p style="font-size: 14px; color: #bbb; min-height: 40px;">Wpisz kod, który dostałeś od znajomego, aby mieć te same karty.</p>
+            <input type="text" id="room-input" placeholder="WPISZ KOD" 
+                   style="padding: 12px; border-radius: 8px; border: none; width: 85%; text-align: center; font-size: 18px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; background: #eee;">
+            <button onclick="joinGame()" style="background: #ffcc00; color: black; width: 100%; font-size: 18px; padding: 15px; border-radius: 10px; cursor: pointer; border: none; font-weight: bold;">DOŁĄCZ</button>
+        </div>
+    </div>
+
+    <div id="lobby-view" style="display: none; margin-top: 20px;">
+        <div style="background: #333; padding: 20px; border-radius: 15px; display: inline-block; border: 2px solid #00ff00; margin-bottom: 20px;">
+            <p style="margin: 0; color: #bbb; font-size: 14px;">KOD TWOJEGO POKOJU:</p>
+            <h2 id="display-code" style="margin: 10px 0; color: white; font-size: 40px; letter-spacing: 5px; background: #111; padding: 10px 30px; border-radius: 10px; font-family: monospace;">---</h2>
+            <button onclick="copyRoomLink()" style="background: #444; color: white; border: 1px solid #666; padding: 8px 15px; border-radius: 5px; font-size: 12px; cursor: pointer;">Skopiuj Link (Wyślij znajomemu)</button>
+        </div>
+
+        <h3 style="margin-bottom: 20px; color: white;">Teraz wybierz kategorię, aby zacząć:</h3>
+        <div id="category-buttons" style="max-width: 900px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+            <button class="cat-btn" onclick="initGame('LEGO BATMAN (1-3)')">Batman</button>
+            <button class="cat-btn" onclick="initGame('LEGO LOTR / HOBBIT')">Władca Pierścieni</button>
+            <button class="cat-btn" onclick="initGame('LEGO CITY UNDERCOVER')">City Undercover</button>
+            <button class="cat-btn" onclick="initGame('LEGO INDIANA JONES')">Indiana Jones</button>
+            <button class="cat-btn" onclick="initGame('LEGO PIRACI Z KARAIBÓW')">Piraci z Karaibów</button>
+            <button class="cat-btn" onclick="initGame('LEGO JURASSIC WORLD')">Jurassic World</button>
+            <button class="cat-btn" onclick="initGame('LEGO PRZYGODA (1 i 2)')">Lego Przygoda</button>
+            <button class="cat-btn" onclick="initGame('LEGO NINJAGO')">Ninjago</button>
+            <button class="cat-btn" onclick="initGame('LEGO DIMENSIONS')">Dimensions</button>
+            <button class="cat-btn" onclick="initGame('MIX')" style="background: linear-gradient(orange, darkorange); color: black; font-weight: bold; border: 1px solid black;">TRYB MIX (Wszystkie)</button>
+        </div>
+        
+        <div style="margin-top: 40px;">
+            <button onclick="location.reload()" style="background: none; border: none; color: #888; text-decoration: underline; cursor: pointer; font-size: 14px;">← Zmień kod pokoju / Wróć</button>
+        </div>
     </div>
 </div>
 
@@ -449,45 +493,47 @@
     // --- LEGO DIMENSIONS SPECIALS ---
     {n:"Vorton", img:"ld48.jpg"}, {n:"X-PO", img:"ld49.jpg"}, {n:"Lord Vortech", img:"ld50.jpg"}, {n:"Portal Chell", img:"ld51.jpg"}, {n:"Wheatley", img:"ld52.jpg"}, {n:"GLaDOS", img:"ld53.jpg"}, {n:"Cave Johnson", img:"ld54.jpg"}, {n:"B.A. Baracus (A-Team)", img:"ld55.jpg"}, {n:"Michael Knight", img:"ld56.jpg"}, {n:"K.I.T.T.", img:"ld57.jpg"}, {n:"Mission Impossible Ethan Hunt", img:"ld58.jpg"}, {n:"Powerpuff Girls Blossom", img:"ld59.jpg"}, {n:"Powerpuff Girls Bubbles", img:"ld60.jpg"}, {n:"Powerpuff Girls Buttercup", img:"ld61.jpg"}, {n:"Mojo Jojo", img:"ld62.jpg"}, {n:"Teen Titans Robin", img:"ld63.jpg"}, {n:"Teen Titans Beast Boy", img:"ld64.jpg"}, {n:"Teen Titans Raven", img:"ld65.jpg"}, {n:"Starfire", img:"ld66.jpg"}, {n:"Cyborg (Teen Titans)", img:"ld67.jpg"}, {n:"Excalibur Batman", img:"ld68.jpg"}, {n:"Buttersworth", img:"ld69.jpg"}, {n:"Lord Greystoke", img:"ld70.jpg"}, {n:"Zane (Dimensions)", img:"ld71.jpg"}, {n:"Cole (Dimensions)", img:"ld72.jpg"}, {n:"Jay (Dimensions)", img:"ld73.jpg"}, {n:"Kai (Dimensions)", img:"ld74.jpg"}, {n:"Nya (Dimensions)", img:"ld75.jpg"}
 ];
-     // --- KONIEC BAZY DANYCH ---
+    // --- KONIEC BAZY DANYCH ---
 
-    // 1. Funkcja aktualizująca wygląd po wpisaniu kodu
-    function updateRoomStatus() {
-        const input = document.getElementById('room-input');
-        const status = document.getElementById('room-status');
-        const share = document.getElementById('share-section');
-        const displayCode = document.getElementById('display-code');
-
-        if (input.value.trim().length > 0) {
-            const code = input.value.trim().toUpperCase();
-            status.innerText = "POKÓJ AKTYWNY";
-            status.style.color = "#00ff00";
-            displayCode.innerText = code;
-            share.style.display = "block";
-        } else {
-            status.innerText = "TRYB SOLO (WPISZ KOD)";
-            status.style.color = "#ffcc00";
-            share.style.display = "none";
-        }
+    // 1. NOWE FUNKCJE OBSŁUGI POKOJU (Zamiast starego updateRoomStatus)
+    function createGame() {
+        const randomCode = "LEGO-" + Math.floor(100 + Math.random() * 899);
+        document.getElementById('room-input').value = randomCode;
+        enterLobby(randomCode);
     }
 
-    // 2. Funkcja kopiowania linku do schowka
-    function copyRoomLink() {
+    function joinGame() {
         const code = document.getElementById('room-input').value.trim();
+        if (code.length < 1) {
+            alert("Najpierw wpisz kod od znajomego!");
+            return;
+        }
+        enterLobby(code);
+    }
+
+    function enterLobby(code) {
+        document.getElementById('setup-view').style.display = 'none';
+        document.getElementById('lobby-view').style.display = 'block';
+        document.getElementById('display-code').innerText = code.toUpperCase();
+    }
+
+    // 2. NOWA FUNKCJA KOPIOWANIA (bierze kod z wyświetlacza)
+    function copyRoomLink() {
+        const code = document.getElementById('display-code').innerText;
         const url = window.location.origin + window.location.pathname + "?room=" + encodeURIComponent(code);
         
         navigator.clipboard.writeText(url).then(() => {
-            alert("Skopiowano link do pokoju! Wyślij go znajomemu.");
+            alert("Link skopiowany! Wyślij go znajomemu.");
         });
     }
 
-    // 3. Funkcja losowania (pomocnicza)
+    // 3. Funkcja losowania (zostaje bez zmian)
     function getRandomCharacters(pool, count) {
         let shuffled = [...pool].sort(() => 0.5 - Math.random());
         return shuffled.slice(0, count);
     }
 
-    // 4. GŁÓWNA LOGIKA GRY
+    // 4. GŁÓWNA LOGIKA GRY (zostaje bez zmian)
     function initGame(category) {
         const menu = document.getElementById('menu');
         const gameArea = document.getElementById('game-area');
@@ -509,7 +555,6 @@
             return;
         }
 
-        // SEEDOWANIE (sprawia, że ten sam kod daje te same karty)
         let seed = 0;
         for(let i=0; i<roomCode.length; i++) seed += roomCode.charCodeAt(i);
         const seededRandom = () => {
@@ -517,11 +562,9 @@
             return seed / 233280;
         };
 
-        // Sortowanie z użyciem seeda
         let shuffled = [...characterPool].sort(() => seededRandom() - 0.5);
         const selectedCharacters = shuffled.slice(0, 24);
 
-        // Wybór celu (każdy gracz dostaje inną postać do zgadnięcia, ale karty te same)
         const targetCharacter = selectedCharacters[Math.floor(Math.random() * selectedCharacters.length)];
         targetNameDisplay.innerText = targetCharacter.n;
 
@@ -551,13 +594,13 @@
         document.getElementById('game-area').style.display = 'none';
     }
 
-    // Automatyczne wczytywanie kodu z linku
+    // 5. AUTOMATYCZNE WCHODZENIE DO LOBBY Z LINKU
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const roomFromUrl = urlParams.get('room');
         if (roomFromUrl) {
             document.getElementById('room-input').value = roomFromUrl;
-            updateRoomStatus();
+            enterLobby(roomFromUrl); // Od razu otwiera lobby z kategoriami
         }
     }
 </script>
