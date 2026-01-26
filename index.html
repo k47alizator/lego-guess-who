@@ -480,7 +480,7 @@ function getRandomCharacters(pool, count) {
       }
 
       // Losowanie 30 postaci i celu
-      const selected = getRandomCharacters(pool, 30);
+      const selected = getRandomCharacters(pool, 24);
       const target = selected[Math.floor(Math.random() * selected.length)];
       
       targetName.innerText = target.n;
