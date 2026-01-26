@@ -135,40 +135,45 @@
 <script>
     const db = {}; // Twoja baza danych wypełni się poniżej
 
-    // Funkcje obsługi pokoju i kopiowania linków
-    function updateRoomStatus() {
-        const input = document.getElementById('room-input');
-        const status = document.getElementById('room-status');
-        const share = document.getElementById('share-section');
+    // 1. FUNKCJE OBSŁUGI POKOJU (STWÓRZ / DOŁĄCZ)
+    function createGame() {
+        const randomCode = "LEGO-" + Math.floor(100 + Math.random() * 899);
+        document.getElementById('room-input').value = randomCode;
+        enterLobby(randomCode);
+    }
 
-        if (input.value.length > 0) {
-            status.innerText = "USTAWIANIE POKOJU: " + input.value.toUpperCase();
-            status.style.color = "#00ff00";
-            share.style.display = "block";
-        } else {
-            status.innerText = "TRYB SOLO";
-            status.style.color = "#ffcc00";
-            share.style.display = "none";
+    function joinGame() {
+        const code = document.getElementById('room-input').value.trim();
+        if (code.length < 1) {
+            alert("Najpierw wpisz kod od znajomego!");
+            return;
         }
+        enterLobby(code);
+    }
+
+    function enterLobby(code) {
+        document.getElementById('setup-view').style.display = 'none';
+        document.getElementById('lobby-view').style.display = 'block';
+        document.getElementById('display-code').innerText = code.toUpperCase();
     }
 
     function copyRoomLink() {
-        const code = document.getElementById('room-input').value;
-        const url = window.location.href.split('?')[0] + "?room=" + encodeURIComponent(code);
+        const code = document.getElementById('display-code').innerText;
+        const url = window.location.origin + window.location.pathname + "?room=" + encodeURIComponent(code);
         navigator.clipboard.writeText(url).then(() => {
             alert("Link skopiowany! Wyślij go znajomemu.");
         });
     }
 
+    // 2. GŁÓWNA LOGIKA GRY
     function initGame(category) {
         const menu = document.getElementById('menu');
         const gameArea = document.getElementById('game-area');
         const grid = document.getElementById('character-grid');
         const targetNameDisplay = document.getElementById('target-name');
         
-        // Pobieramy kod pokoju
-        const roomInput = document.getElementById('room-input');
-        const roomCode = (roomInput && roomInput.value.trim() !== "") ? roomInput.value.trim() : Math.random().toString();
+        // Pobieramy kod z wyświetlacza lobby
+        const roomCode = document.getElementById('display-code').innerText;
         
         let characterPool = [];
         if (category === "MIX") {
@@ -177,10 +182,11 @@
             characterPool = [...db[category]];
         }
 
-        if (characterPool.length === 0) return alert("Błąd bazy danych!");
+        if (characterPool.length === 0) return alert("Błąd: Nie znaleziono postaci w tej kategorii!");
+
         grid.innerHTML = ''; 
 
-        // Mieszanie na podstawie kodu (Seed)
+        // Mieszanie na podstawie kodu pokoju (Seed)
         let seed = 0;
         for(let i=0; i<roomCode.length; i++) seed += roomCode.charCodeAt(i);
         const seededRandom = () => {
@@ -188,15 +194,19 @@
             return seed / 233280;
         };
 
+        // Tasujemy karty używając seeda
         let shuffled = [...characterPool].sort(() => seededRandom() - 0.5);
         const selectedCharacters = shuffled.slice(0, 24);
 
-        const targetCharacter = selectedCharacters[Math.floor(Math.random() * selectedCharacters.length)];
+        // LOSOWANIE TEJ SAMEJ POSTACI DLA OBU GRACZY
+        const targetIndex = Math.floor(seededRandom() * selectedCharacters.length);
+        const targetCharacter = selectedCharacters[targetIndex];
         targetNameDisplay.innerText = targetCharacter.n;
 
+        // Tworzenie kart
         selectedCharacters.forEach(char => {
-            const searchName = char.n.replace(/\(.*\)/, '').trim();
-            const searchQuery = encodeURIComponent("lego " + searchName + " minifigure");
+            const cleanName = char.n.replace(/\(.*\)/, '').trim();
+            const searchQuery = encodeURIComponent("lego " + cleanName + " minifigure");
             const imgUrl = `https://tse2.mm.bing.net/th?q=${searchQuery}&w=200&h=200&c=7&rs=1&p=0&dpr=1&pid=1.7`;
 
             const card = document.createElement('div');
@@ -216,21 +226,20 @@
     }
 
     function backToMenu() {
-        document.getElementById('menu').style.display = 'block';
-        document.getElementById('game-area').style.display = 'none';
+        location.reload(); // Resetuje grę i wraca do startu
     }
 
-    // Automatyczne wczytywanie kodu z linku
+    // Automatyczne wczytywanie z linku
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const roomFromUrl = urlParams.get('room');
         if (roomFromUrl) {
             document.getElementById('room-input').value = roomFromUrl;
-            updateRoomStatus();
+            enterLobby(roomFromUrl);
         }
     }
 
-        // --- TUTAJ ZACZYNAJĄ SIĘ TWOJE DANE ---
+    // --- TUTAJ ZACZYNAJĄ SIĘ TWOJE DANE ---
 
         db["LEGO STAR WARS"] = [
     // --- LUKE SKYWALKER ---
@@ -545,15 +554,17 @@ db["LEGO INIEMAMOCNI"].push(
 );
     // --- KONIEC BAZY DANYCH ---
 
-    // 1. NOWE FUNKCJE OBSŁUGI POKOJU (Zamiast starego updateRoomStatus)
+    // 1. FUNKCJE OBSŁUGI POKOJU
     function createGame() {
         const randomCode = "LEGO-" + Math.floor(100 + Math.random() * 899);
-        document.getElementById('room-input').value = randomCode;
+        const input = document.getElementById('room-input');
+        if(input) input.value = randomCode;
         enterLobby(randomCode);
     }
 
     function joinGame() {
-        const code = document.getElementById('room-input').value.trim();
+        const input = document.getElementById('room-input');
+        const code = input ? input.value.trim() : "";
         if (code.length < 1) {
             alert("Najpierw wpisz kod od znajomego!");
             return;
@@ -562,14 +573,19 @@ db["LEGO INIEMAMOCNI"].push(
     }
 
     function enterLobby(code) {
-        document.getElementById('setup-view').style.display = 'none';
-        document.getElementById('lobby-view').style.display = 'block';
-        document.getElementById('display-code').innerText = code.toUpperCase();
+        const setupView = document.getElementById('setup-view');
+        const lobbyView = document.getElementById('lobby-view');
+        const displayCode = document.getElementById('display-code');
+        
+        if(setupView) setupView.style.display = 'none';
+        if(lobbyView) lobbyView.style.display = 'block';
+        if(displayCode) displayCode.innerText = code.toUpperCase();
     }
 
-    // 2. NOWA FUNKCJA KOPIOWANIA (bierze kod z wyświetlacza)
+    // 2. KOPIOWANIE LINKU
     function copyRoomLink() {
-        const code = document.getElementById('display-code').innerText;
+        const displayCode = document.getElementById('display-code');
+        const code = displayCode ? displayCode.innerText : "";
         const url = window.location.origin + window.location.pathname + "?room=" + encodeURIComponent(code);
         
         navigator.clipboard.writeText(url).then(() => {
@@ -577,21 +593,17 @@ db["LEGO INIEMAMOCNI"].push(
         });
     }
 
-    // 3. Funkcja losowania (zostaje bez zmian)
-    function getRandomCharacters(pool, count) {
-        let shuffled = [...pool].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, count);
-    }
-
-    // 4. GŁÓWNA LOGIKA GRY (zostaje bez zmian)
+    // 3. GŁÓWNA LOGIKA GRY
     function initGame(category) {
+        const lobbyView = document.getElementById('lobby-view');
         const menu = document.getElementById('menu');
         const gameArea = document.getElementById('game-area');
         const targetNameDisplay = document.getElementById('target-name');
         const grid = document.getElementById('character-grid');
         
-        const roomInput = document.getElementById('room-input');
-        const roomCode = (roomInput && roomInput.value.trim() !== "") ? roomInput.value.trim().toUpperCase() : Math.random().toString();
+        // Pobieramy kod z wyświetlacza lobby
+        const displayCode = document.getElementById('display-code');
+        const roomCode = (displayCode && displayCode.innerText !== "") ? displayCode.innerText : "SOLO";
         
         let characterPool = [];
         if (category === "MIX") {
@@ -601,10 +613,11 @@ db["LEGO INIEMAMOCNI"].push(
         }
 
         if (characterPool.length === 0) {
-            alert("Błąd: Nie znaleziono postaci!");
+            alert("Błąd: Nie znaleziono postaci w kategorii: " + category);
             return;
         }
 
+        // SEEDOWANIE (żeby obaj gracze mieli to samo)
         let seed = 0;
         for(let i=0; i<roomCode.length; i++) seed += roomCode.charCodeAt(i);
         const seededRandom = () => {
@@ -612,22 +625,27 @@ db["LEGO INIEMAMOCNI"].push(
             return seed / 233280;
         };
 
+        // Mieszanie kart - zawsze tak samo dla tego samego kodu
         let shuffled = [...characterPool].sort(() => seededRandom() - 0.5);
         const selectedCharacters = shuffled.slice(0, 24);
 
-        const targetCharacter = selectedCharacters[Math.floor(Math.random() * selectedCharacters.length)];
+        // LOSOWANIE CELU - NAPRAWIONE (używa seededRandom)
+        const targetIndex = Math.floor(seededRandom() * selectedCharacters.length);
+        const targetCharacter = selectedCharacters[targetIndex];
         targetNameDisplay.innerText = targetCharacter.n;
 
         grid.innerHTML = ''; 
 
         selectedCharacters.forEach(char => {
-            const searchQuery = encodeURIComponent("lego " + char.n + " minifigure");
+            // Czyścimy nazwę do wyszukiwarki (usuwamy tekst w nawiasach)
+            const cleanName = char.n.replace(/\(.*\)/, '').trim();
+            const searchQuery = encodeURIComponent("lego " + cleanName + " minifigure");
             const imgUrl = `https://tse2.mm.bing.net/th?q=${searchQuery}&w=200&h=300&c=7&rs=1&p=0&dpr=1&pid=1.7`;
 
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
-                <div class="card-img" style="background-image: url('${imgUrl}'); background-size: contain; background-repeat: no-repeat; background-position: center; height: 140px;"></div>
+                <div class="card-img" style="background-image: url('${imgUrl}'); background-size: contain; background-repeat: no-repeat; background-position: center; height: 140px; background-color: #f0f0f0; border-radius: 5px;"></div>
                 <p style="margin-top: 8px; font-weight: bold; font-size: 12px; color: black;">${char.n}</p>
             `;
             
@@ -635,22 +653,24 @@ db["LEGO INIEMAMOCNI"].push(
             grid.appendChild(card);
         });
 
-        menu.style.display = 'none';
+        if(lobbyView) lobbyView.style.display = 'none';
+        if(menu) menu.style.display = 'none';
         gameArea.style.display = 'block';
     }
 
     function backToMenu() {
-        document.getElementById('menu').style.display = 'block';
-        document.getElementById('game-area').style.display = 'none';
+        // Najprostszy reset gry
+        location.reload();
     }
 
-    // 5. AUTOMATYCZNE WCHODZENIE DO LOBBY Z LINKU
+    // 4. START Z LINKU
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const roomFromUrl = urlParams.get('room');
         if (roomFromUrl) {
-            document.getElementById('room-input').value = roomFromUrl;
-            enterLobby(roomFromUrl); // Od razu otwiera lobby z kategoriami
+            const input = document.getElementById('room-input');
+            if(input) input.value = roomFromUrl;
+            enterLobby(roomFromUrl);
         }
     }
 </script>
