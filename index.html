@@ -132,8 +132,19 @@
     </div>
 </div>
 
+<div id="game-area" style="display:none; text-align: center;">
+    <div style="background: #333; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #ffcc00; display: inline-block;">
+        <h2 style="margin: 0;">Twoja postać to: <span id="target-name" style="color: #ffcc00; text-transform: uppercase;">...</span></h2>
+        <p style="font-size: 12px; color: #aaa; margin: 5px 0 0 0;">(Nie pokazuj jej znajomemu!)</p>
+    </div>
+    <div style="margin-bottom: 20px;">
+        <button onclick="backToMenu()" style="background: #666; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; border: none; font-weight: bold;">← WRÓĆ DO MENU</button>
+    </div>
+    <div id="character-grid"></div>
+</div>
+
 <script>
-    const db = {}; // Twoja baza danych wypełni się poniżej
+    const db = {};
 
     // 1. FUNKCJE OBSŁUGI POKOJU (STWÓRZ / DOŁĄCZ)
     function createGame() {
