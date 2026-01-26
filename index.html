@@ -144,9 +144,14 @@
 </div>
 
 <script>
-    const db = {};
+    // 1. TWOJA KONFIGURACJA GITHUBA
+    const githubConfig = {
+        user: "k47alizator",
+        repo: "lego-guess-who",
+        folder: "img"
+    };
 
-    // 1. FUNKCJE OBSŁUGI POKOJU (STWÓRZ / DOŁĄCZ)
+    // 2. FUNKCJE OBSŁUGI POKOJU
     function createGame() {
         const randomCode = "LEGO-" + Math.floor(100 + Math.random() * 899);
         document.getElementById('room-input').value = randomCode;
@@ -176,14 +181,13 @@
         });
     }
 
-    // 2. GŁÓWNA LOGIKA GRY
+    // 3. GŁÓWNA LOGIKA GRY (POPRAWIONE LOSOWANIE I OBRAZKI)
     function initGame(category) {
         const menu = document.getElementById('menu');
         const gameArea = document.getElementById('game-area');
         const grid = document.getElementById('character-grid');
         const targetNameDisplay = document.getElementById('target-name');
         
-        // Pobieramy kod z wyświetlacza lobby
         const roomCode = document.getElementById('display-code').innerText;
         
         let characterPool = [];
@@ -193,11 +197,11 @@
             characterPool = [...db[category]];
         }
 
-        if (characterPool.length === 0) return alert("Błąd: Nie znaleziono postaci w tej kategorii!");
+        if (characterPool.length === 0) return alert("Błąd: Brak postaci w tej kategorii!");
 
         grid.innerHTML = ''; 
 
-        // Mieszanie na podstawie kodu pokoju (Seed)
+        // Seedowanie układu planszy (stałe dla obu graczy)
         let seed = 0;
         for(let i=0; i<roomCode.length; i++) seed += roomCode.charCodeAt(i);
         const seededRandom = () => {
@@ -205,29 +209,54 @@
             return seed / 233280;
         };
 
-        // Tasujemy karty używając seeda
+        // Tasujemy planszę wg seeda (identyczna u obu)
         let shuffled = [...characterPool].sort(() => seededRandom() - 0.5);
         const selectedCharacters = shuffled.slice(0, 24);
 
-        // LOSOWANIE TEJ SAMEJ POSTACI DLA OBU GRACZY
-        const targetIndex = Math.floor(seededRandom() * selectedCharacters.length);
+        // LOSOWANIE TWOJEJ POSTACI (Math.random sprawia, że każdy ma inną!)
+        const targetIndex = Math.floor(Math.random() * selectedCharacters.length);
         const targetCharacter = selectedCharacters[targetIndex];
         targetNameDisplay.innerText = targetCharacter.n;
 
         // Tworzenie kart
         selectedCharacters.forEach(char => {
-            const cleanName = char.n.replace(/\(.*\)/, '').trim();
-            const searchQuery = encodeURIComponent("lego " + cleanName + " minifigure");
-            const imgUrl = `https://tse2.mm.bing.net/th?q=${searchQuery}&w=200&h=200&c=7&rs=1&p=0&dpr=1&pid=1.7`;
-
             const card = document.createElement('div');
             card.className = 'card';
+            
+            const fileName = encodeURIComponent(char.n) + ".jpg";
+            const urlGithub = `https://raw.githubusercontent.com/${githubConfig.user}/${githubConfig.repo}/main/${githubConfig.folder}/${fileName}`;
+            const cleanName = char.n.replace(/\(.*\)/, '').trim();
+            const urlInternet = `https://tse2.mm.bing.net/th?q=lego+${encodeURIComponent(cleanName)}+minifigure&w=200&h=200&c=7&rs=1&p=0&dpr=1&pid=1.7`;
+
             card.innerHTML = `
-                <div class="card-img" style="height: 140px; display: flex; align-items: center; justify-content: center; background: #eee; border-radius: 5px; overflow: hidden;">
-                    <img src="${imgUrl}" onerror="this.src='https://via.placeholder.com/150?text=LEGO'" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                <div class="card-img-wrapper" style="position: relative; height: 140px; background: #eee; border-radius: 5px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                    <img class="main-img" src="${urlGithub}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                    <button class="dl-btn" style="display:none; position: absolute; bottom: 0; width: 100%; background: #28a745; color: white; border: none; font-size: 10px; padding: 5px; cursor: pointer; font-weight: bold;">📥 ZAPISZ DLA GITHUBA</button>
                 </div>
                 <p style="margin-top: 8px; font-weight: bold; font-size: 12px; color: black;">${char.n}</p>
             `;
+
+            const imgTag = card.querySelector('.main-img');
+            const dlBtn = card.querySelector('.dl-btn');
+
+            // Jeśli błąd (brak na GitHubie), przełącz na Bing i pokaż przycisk
+            imgTag.onerror = function() {
+                if (imgTag.src !== urlInternet) {
+                    imgTag.src = urlInternet;
+                    dlBtn.style.display = "block";
+                }
+            };
+
+            dlBtn.onclick = (e) => {
+                e.stopPropagation();
+                const link = document.createElement('a');
+                link.href = urlInternet;
+                link.download = char.n + ".jpg";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+
             card.onclick = () => card.classList.toggle('hidden');
             grid.appendChild(card);
         });
@@ -237,10 +266,9 @@
     }
 
     function backToMenu() {
-        location.reload(); // Resetuje grę i wraca do startu
+        location.reload();
     }
 
-    // Automatyczne wczytywanie z linku
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const roomFromUrl = urlParams.get('room');
