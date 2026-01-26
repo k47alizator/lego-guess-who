@@ -84,44 +84,61 @@
             return shuffled.slice(0, count);
         }
 
-        function initGame(category) {
-            const menu = document.getElementById('menu');
-            const gameArea = document.getElementById('game-area');
-            const grid = document.getElementById('character-grid'); // Poprawione ID
-            const targetNameDisplay = document.getElementById('target-name');
-            let characterPool = [];
-
-            if (category === "MIX") {
-                Object.keys(db).forEach(key => { characterPool = characterPool.concat(db[key]); });
-            } else if (db[category]) {
-                characterPool = [...db[category]];
-            }
-
-            if (characterPool.length === 0) return alert("Błąd: Brak danych!");
-
-            grid.innerHTML = ''; 
-            const selectedCharacters = getRandomCharacters(characterPool, 30);
-            const targetCharacter = selectedCharacters[Math.floor(Math.random() * selectedCharacters.length)];
-            targetNameDisplay.innerText = targetCharacter.n;
-
-            selectedCharacters.forEach(char => {
-                const autoImgUrl = `https://external-content.duckduckgo.com/iu/?u=https://tse1.mm.bing.net/th?q=lego+minifigure+${encodeURIComponent(char.n)}`;
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <div style="height: 140px; display: flex; align-items: center; justify-content: center;">
-                        <img src="${autoImgUrl}" onerror="this.src='https://via.placeholder.com/150?text=LEGO'" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                    </div>
-                    <p>${char.n}</p>
-                `;
-                card.onclick = () => card.classList.toggle('hidden');
-                grid.appendChild(card);
-            });
-
-            menu.style.display = 'none';
-            gameArea.style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+function initGame(category) {
+        const menu = document.getElementById('menu');
+        const gameArea = document.getElementById('game-area');
+        const grid = document.getElementById('character-grid');
+        const targetNameDisplay = document.getElementById('target-name');
+        
+        // Pobieramy kod pokoju (jeśli wpisany)
+        const roomCode = document.getElementById('room-input')?.value || Math.random().toString();
+        
+        let characterPool = [];
+        if (category === "MIX") {
+            Object.keys(db).forEach(key => { characterPool = characterPool.concat(db[key]); });
+        } else if (db[category]) {
+            characterPool = [...db[category]];
         }
+
+        if (characterPool.length === 0) return alert("Błąd bazy danych!");
+
+        grid.innerHTML = ''; 
+
+        // Funkcja mieszająca oparta na kodzie pokoju (Seed)
+        // Dzięki temu ze znajomym będziecie mieć te same postacie!
+        const seededRandom = (seed) => {
+            let x = Math.sin(seed++) * 10000;
+            return x - Math.floor(x);
+        };
+
+        let seed = 0;
+        for(let i=0; i<roomCode.length; i++) seed += roomCode.charCodeAt(i);
+
+        let shuffled = [...characterPool].sort(() => seededRandom(seed++) - 0.5);
+        const selectedCharacters = shuffled.slice(0, 24);
+
+        // Losujemy cel (Twoją postać) - to akurat każdy ma inne!
+        const targetCharacter = selectedCharacters[Math.floor(Math.random() * selectedCharacters.length)];
+        targetNameDisplay.innerText = targetCharacter.n;
+
+        selectedCharacters.forEach(char => {
+            // Zmieniony link na bardziej bezpośredni z Bing/DuckDuckGo
+            const query = encodeURIComponent("lego " + char.n + " minifigure");
+            const autoImgUrl = `https://www.bing.com/th?id=OIP.123&q=${query}&w=150&h=150&c=7&rs=1&p=0&dpr=1&pid=1.7`;
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="card-img" style="background-image: url('${autoImgUrl}'), url('https://via.placeholder.com/150?text=LEGO')"></div>
+                <p>${char.n}</p>
+            `;
+            card.onclick = () => card.classList.toggle('hidden');
+            grid.appendChild(card);
+        });
+
+        menu.style.display = 'none';
+        gameArea.style.display = 'block';
+    }
 
         function backToMenu() {
             document.getElementById('menu').style.display = 'block';
