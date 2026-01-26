@@ -5,23 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LEGO Zgadnij Kto To!</title>
     <style>
-        /* Twoje dotychczasowe style */
         body { 
             font-family: 'Segoe UI', sans-serif; 
-            background: #1a1a1a; 
-            color: white; 
-            text-align: center; 
-            margin: 0; 
-            padding: 20px; 
+            background: #1a1a1a; color: white; text-align: center; margin: 0; padding: 20px; 
         }
         h1 { color: #ffcc00; text-shadow: 2px 2px #000; }
         #menu { 
-            background: #333; 
-            padding: 20px; 
-            border-radius: 15px; 
-            margin: 0 auto 20px auto; 
-            border: 3px solid #ffcc00; 
-            max-width: 800px;
+            background: #333; padding: 20px; border-radius: 15px; 
+            margin: 0 auto 20px auto; border: 3px solid #ffcc00; max-width: 800px;
         }
         button { 
             background: #444; color: white; border: 2px solid #ffcc00; 
@@ -29,129 +20,74 @@
             cursor: pointer; transition: 0.3s; font-weight: bold;
         }
         button:hover { background: #ffcc00; color: black; }
-        
-        .card-img { 
-            width: 100%; height: 150px; 
-            background-size: contain; background-repeat: no-repeat; 
-            background-position: center; margin-bottom: 10px;
-        }
         #character-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
             gap: 15px; padding: 20px; max-width: 1200px; margin: 0 auto; 
         }
         .card { 
-            background: white; color: black; padding: 10px; 
-            border-radius: 10px; cursor: pointer; transition: 0.2s; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5); 
+            background: white; color: black; padding: 10px; border-radius: 10px; 
+            cursor: pointer; transition: 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.5); 
         }
         .card.hidden { opacity: 0.15; filter: grayscale(100%) brightness(50%); }
-
-        /* NOWE STYLE DLA PRZYCISKÓW KATEGORII I LOBBY */
         .cat-btn {
-            padding: 12px 18px;
-            background: #444;
-            color: white;
-            border: 2px solid #555;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.2s ease;
+            padding: 12px 18px; background: #444; color: white; border: 2px solid #555;
+            border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.2s ease;
             min-width: 140px;
         }
-
-        .cat-btn:hover {
-            background: #00ff00;
-            color: black;
-            transform: scale(1.05);
-            border-color: white;
-        }
-
-        @media (max-width: 600px) {
-            #setup-view {
-                flex-direction: column;
-                align-items: center;
-                gap: 15px;
-            }
-        }
+        .cat-btn:hover { background: #00ff00; color: black; transform: scale(1.05); }
     </style>
 </head>
 <body>
 
-    <h1>LEGO Zgadnij Kto To!</h1>
+    <div id="menu">
+        <h1 style="font-size: 3em; margin-bottom: 10px;">LEGO GUESS WHO</h1>
 
-   <div id="menu" style="text-align: center; font-family: sans-serif; padding: 20px;">
-    <h1 style="color: #ffcc00; text-shadow: 2px 2px black; font-size: 3em; margin-bottom: 10px;">LEGO GUESS WHO</h1>
-
-    <div id="setup-view" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 30px;">
-        
-        <div style="background: #2a2a2a; padding: 25px; border: 3px solid #0088ff; border-radius: 20px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-            <h3 style="color: #0088ff; margin-top: 0;">STWÓRZ GRĘ</h3>
-            <p style="font-size: 14px; color: #bbb; min-height: 40px;">Wybierz tę opcję, aby wygenerować nowy kod dla siebie i znajomego.</p>
-            <button onclick="createGame()" style="background: #0088ff; color: white; width: 100%; font-size: 18px; padding: 15px; border-radius: 10px; cursor: pointer; border: none; font-weight: bold;">GENERUJ KOD</button>
+        <div id="setup-view" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 30px;">
+            <div style="background: #2a2a2a; padding: 25px; border: 3px solid #0088ff; border-radius: 20px; width: 300px;">
+                <h3 style="color: #0088ff; margin-top: 0;">STWÓRZ GRĘ</h3>
+                <button onclick="createGame()" style="background: #0088ff; color: white; width: 100%; font-size: 18px; padding: 15px; border-radius: 10px; border: none;">GENERUJ KOD</button>
+            </div>
+            <div style="background: #2a2a2a; padding: 25px; border: 3px solid #ffcc00; border-radius: 20px; width: 300px;">
+                <h3 style="color: #ffcc00; margin-top: 0;">DOŁĄCZ DO GRY</h3>
+                <input type="text" id="room-input" placeholder="WPISZ KOD" style="padding: 12px; border-radius: 8px; width: 85%; text-align: center; font-size: 18px; margin-bottom: 15px; background: #eee; color: black;">
+                <button onclick="joinGame()" style="background: #ffcc00; color: black; width: 100%; font-size: 18px; padding: 15px; border-radius: 10px; border: none;">DOŁĄCZ</button>
+            </div>
         </div>
 
-        <div style="background: #2a2a2a; padding: 25px; border: 3px solid #ffcc00; border-radius: 20px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-            <h3 style="color: #ffcc00; margin-top: 0;">DOŁĄCZ DO GRY</h3>
-            <p style="font-size: 14px; color: #bbb; min-height: 40px;">Wpisz kod, który dostałeś od znajomego, aby mieć te same karty.</p>
-            <input type="text" id="room-input" placeholder="WPISZ KOD" 
-                   style="padding: 12px; border-radius: 8px; border: none; width: 85%; text-align: center; font-size: 18px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; background: #eee;">
-            <button onclick="joinGame()" style="background: #ffcc00; color: black; width: 100%; font-size: 18px; padding: 15px; border-radius: 10px; cursor: pointer; border: none; font-weight: bold;">DOŁĄCZ</button>
+        <div id="lobby-view" style="display: none; margin-top: 20px;">
+            <div style="background: #333; padding: 20px; border-radius: 15px; border: 2px solid #00ff00; display: inline-block;">
+                <p style="margin: 0; color: #bbb;">KOD TWOJEGO POKOJU:</p>
+                <h2 id="display-code" style="margin: 10px 0; font-size: 40px; font-family: monospace; color: white;">---</h2>
+                <button onclick="copyRoomLink()" style="font-size: 12px; background: #555;">Skopiuj Link dla znajomego</button>
+            </div>
+            <h3 style="margin: 20px 0;">Wybierz kategorię:</h3>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                <button class="cat-btn" onclick="initGame('LEGO STAR WARS')">Star Wars</button>
+                <button class="cat-btn" onclick="initGame('LEGO INIEMAMOCNI')">Iniemamocni</button>
+                <button class="cat-btn" onclick="initGame('LEGO BATMAN (1-3)')">Batman</button>
+                <button class="cat-btn" onclick="initGame('LEGO NINJAGO')">Ninjago</button>
+                <button class="cat-btn" onclick="initGame('MIX')" style="background: orange; color: black;">TRYB MIX</button>
+            </div>
         </div>
     </div>
 
-    <div id="lobby-view" style="display: none; margin-top: 20px;">
-        <div style="background: #333; padding: 20px; border-radius: 15px; display: inline-block; border: 2px solid #00ff00; margin-bottom: 20px;">
-            <p style="margin: 0; color: #bbb; font-size: 14px;">KOD TWOJEGO POKOJU:</p>
-            <h2 id="display-code" style="margin: 10px 0; color: white; font-size: 40px; letter-spacing: 5px; background: #111; padding: 10px 30px; border-radius: 10px; font-family: monospace;">---</h2>
-            <button onclick="copyRoomLink()" style="background: #444; color: white; border: 1px solid #666; padding: 8px 15px; border-radius: 5px; font-size: 12px; cursor: pointer;">Skopiuj Link (Wyślij znajomemu)</button>
+    <div id="game-area" style="display:none;">
+        <div style="background: #333; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #ffcc00; display: inline-block;">
+            <h2 style="margin: 0;">Twoja postać to: <span id="target-name" style="color: #ffcc00;">...</span></h2>
         </div>
-
-        <h3 style="margin-bottom: 20px; color: white;">Teraz wybierz kategorię, aby zacząć:</h3>
-<div id="category-buttons" style="max-width: 900px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
-    <button class="cat-btn" onclick="initGame('LEGO INIEMAMOCNI')">Iniemamocni</button>
-    <button class="cat-btn" onclick="initGame('LEGO STAR WARS')">Star Wars</button>
-    <button class="cat-btn" onclick="initGame('LEGO MARVEL / AVENGERS')">Marvel / Avengers</button>
-    <button class="cat-btn" onclick="initGame('LEGO HARRY POTTER')">Harry Potter</button>
-    <button class="cat-btn" onclick="initGame('LEGO LOTR / HOBBIT')">Władca Pierścieni / Hobbit</button>
-    <button class="cat-btn" onclick="initGame('LEGO BATMAN (1-3)')">Batman</button>
-    <button class="cat-btn" onclick="initGame('LEGO CITY UNDERCOVER')">City Undercover</button>
-    <button class="cat-btn" onclick="initGame('LEGO INDIANA JONES')">Indiana Jones</button>
-    <button class="cat-btn" onclick="initGame('LEGO PIRACI Z KARAIBÓW')">Piraci z Karaibów</button>
-    <button class="cat-btn" onclick="initGame('LEGO JURASSIC WORLD')">Jurassic World</button>
-    <button class="cat-btn" onclick="initGame('LEGO PRZYGODA (1 i 2)')">Lego Przygoda</button>
-    <button class="cat-btn" onclick="initGame('LEGO NINJAGO')">Ninjago</button>
-    <button class="cat-btn" onclick="initGame('LEGO DIMENSIONS')">Dimensions</button>
-    
-    <button class="cat-btn" onclick="initGame('MIX')" style="background: linear-gradient(orange, darkorange); color: black; font-weight: bold; border: 1px solid black;">TRYB MIX (Wszystkie)</button>
-</div>
-        
-        <div style="margin-top: 40px;">
-            <button onclick="location.reload()" style="background: none; border: none; color: #888; text-decoration: underline; cursor: pointer; font-size: 14px;">← Zmień kod pokoju / Wróć</button>
+        <div>
+            <button onclick="location.reload()">← WRÓĆ DO MENU</button>
         </div>
+        <div id="character-grid"></div>
     </div>
-</div>
-
-<div id="game-area" style="display:none; text-align: center;">
-    <div style="background: #333; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #ffcc00; display: inline-block;">
-        <h2 style="margin: 0;">Twoja postać to: <span id="target-name" style="color: #ffcc00; text-transform: uppercase;">...</span></h2>
-        <p style="font-size: 12px; color: #aaa; margin: 5px 0 0 0;">(Nie pokazuj jej znajomemu!)</p>
-    </div>
-    <div style="margin-bottom: 20px;">
-        <button onclick="backToMenu()" style="background: #666; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; border: none; font-weight: bold;">← WRÓĆ DO MENU</button>
-    </div>
-    <div id="character-grid"></div>
-</div>
 
 <script>
-    // 1. TWOJA KONFIGURACJA GITHUBA
     const githubConfig = {
         user: "k47alizator",
         repo: "lego-guess-who",
         folder: "img"
     };
 
-    // 2. FUNKCJE OBSŁUGI POKOJU
     function createGame() {
         const randomCode = "LEGO-" + Math.floor(100 + Math.random() * 899);
         document.getElementById('room-input').value = randomCode;
@@ -160,10 +96,7 @@
 
     function joinGame() {
         const code = document.getElementById('room-input').value.trim();
-        if (code.length < 1) {
-            alert("Najpierw wpisz kod od znajomego!");
-            return;
-        }
+        if (code === "") return alert("Najpierw wpisz kod!");
         enterLobby(code);
     }
 
@@ -176,32 +109,26 @@
     function copyRoomLink() {
         const code = document.getElementById('display-code').innerText;
         const url = window.location.origin + window.location.pathname + "?room=" + encodeURIComponent(code);
-        navigator.clipboard.writeText(url).then(() => {
-            alert("Link skopiowany! Wyślij go znajomemu.");
-        });
+        navigator.clipboard.writeText(url).then(() => alert("Link skopiowany!"));
     }
 
-    // 3. GŁÓWNA LOGIKA GRY (POPRAWIONE LOSOWANIE I OBRAZKI)
     function initGame(category) {
-        const menu = document.getElementById('menu');
-        const gameArea = document.getElementById('game-area');
         const grid = document.getElementById('character-grid');
         const targetNameDisplay = document.getElementById('target-name');
-        
         const roomCode = document.getElementById('display-code').innerText;
         
         let characterPool = [];
         if (category === "MIX") {
-            Object.keys(db).forEach(key => { characterPool = characterPool.concat(db[key]); });
-        } else if (db[category]) {
-            characterPool = [...db[category]];
+            Object.keys(db).forEach(k => characterPool = characterPool.concat(db[k]));
+        } else {
+            characterPool = db[category] || [];
         }
 
         if (characterPool.length === 0) return alert("Błąd: Brak postaci w tej kategorii!");
 
-        grid.innerHTML = ''; 
-
-        // Seedowanie układu planszy (stałe dla obu graczy)
+        grid.innerHTML = '';
+        
+        // Seedowanie (identyczny układ planszy)
         let seed = 0;
         for(let i=0; i<roomCode.length; i++) seed += roomCode.charCodeAt(i);
         const seededRandom = () => {
@@ -209,29 +136,25 @@
             return seed / 233280;
         };
 
-        // Tasujemy planszę wg seeda (identyczna u obu)
         let shuffled = [...characterPool].sort(() => seededRandom() - 0.5);
         const selectedCharacters = shuffled.slice(0, 24);
 
-        // LOSOWANIE TWOJEJ POSTACI (Math.random sprawia, że każdy ma inną!)
+        // Losowanie unikalnego celu
         const targetIndex = Math.floor(Math.random() * selectedCharacters.length);
-        const targetCharacter = selectedCharacters[targetIndex];
-        targetNameDisplay.innerText = targetCharacter.n;
+        targetNameDisplay.innerText = selectedCharacters[targetIndex].n;
 
-        // Tworzenie kart
         selectedCharacters.forEach(char => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            
             const fileName = encodeURIComponent(char.n) + ".jpg";
             const urlGithub = `https://raw.githubusercontent.com/${githubConfig.user}/${githubConfig.repo}/main/${githubConfig.folder}/${fileName}`;
             const cleanName = char.n.replace(/\(.*\)/, '').trim();
-            const urlInternet = `https://tse2.mm.bing.net/th?q=lego+${encodeURIComponent(cleanName)}+minifigure&w=200&h=200&c=7&rs=1&p=0&dpr=1&pid=1.7`;
+            const urlInternet = `https://tse2.mm.bing.net/th?q=lego+${encodeURIComponent(cleanName)}+minifigure&w=200&h=300&c=7&rs=1&p=0&dpr=1&pid=1.7`;
 
+            const card = document.createElement('div');
+            card.className = 'card';
             card.innerHTML = `
-                <div class="card-img-wrapper" style="position: relative; height: 140px; background: #eee; border-radius: 5px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                <div style="position: relative; height: 140px; background: #eee; border-radius: 5px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
                     <img class="main-img" src="${urlGithub}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                    <button class="dl-btn" style="display:none; position: absolute; bottom: 0; width: 100%; background: #28a745; color: white; border: none; font-size: 10px; padding: 5px; cursor: pointer; font-weight: bold;">📥 ZAPISZ DLA GITHUBA</button>
+                    <button class="dl-btn" style="display:none; position: absolute; bottom: 0; width: 100%; background: #28a745; color: white; border: none; font-size: 10px; padding: 5px; cursor: pointer;">📥 ZAPISZ DO IMG</button>
                 </div>
                 <p style="margin-top: 8px; font-weight: bold; font-size: 12px; color: black;">${char.n}</p>
             `;
@@ -239,7 +162,6 @@
             const imgTag = card.querySelector('.main-img');
             const dlBtn = card.querySelector('.dl-btn');
 
-            // Jeśli błąd (brak na GitHubie), przełącz na Bing i pokaż przycisk
             imgTag.onerror = function() {
                 if (imgTag.src !== urlInternet) {
                     imgTag.src = urlInternet;
@@ -249,36 +171,20 @@
 
             dlBtn.onclick = (e) => {
                 e.stopPropagation();
-                const link = document.createElement('a');
-                link.href = urlInternet;
-                link.download = char.n + ".jpg";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                const a = document.createElement('a');
+                a.href = urlInternet; a.download = char.n + ".jpg";
+                a.click();
             };
 
             card.onclick = () => card.classList.toggle('hidden');
             grid.appendChild(card);
         });
 
-        menu.style.display = 'none';
-        gameArea.style.display = 'block';
+        document.getElementById('menu').style.display = 'none';
+        document.getElementById('game-area').style.display = 'block';
     }
 
-    function backToMenu() {
-        location.reload();
-    }
-
-    window.onload = function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const roomFromUrl = urlParams.get('room');
-        if (roomFromUrl) {
-            document.getElementById('room-input').value = roomFromUrl;
-            enterLobby(roomFromUrl);
-        }
-    }
-
-    // --- TUTAJ ZACZYNAJĄ SIĘ TWOJE DANE ---
+    // --- TUTAJ TWOJA BAZA POSTACI (KONTROLUJ CZY JEST DOBRZE ZAMKNIĘTA) ---
 db["LEGO STAR WARS"] = [
     // --- LUKE SKYWALKER ---
     {n:"Luke Skywalker (z Tatooine)"}, {n:"Luke Skywalker (Pilot X-Wing)"}, {n:"Luke Skywalker (z Bespin)"}, {n:"Luke Skywalker (z Dagobah)"}, {n:"Luke Skywalker (Rycerz Jedi)"}, {n:"Luke Skywalker (z Endor)"}, {n:"Luke Skywalker (Szturmowiec)"}, {n:"Luke Skywalker (z Hoth)"}, {n:"Luke Skywalker (Ceremonia)"}, {n:"Luke Skywalker (Stary Luke)"}, {n:"Luke Skywalker (z Crait)"}, {n:"Luke Skywalker (Duch Mocy)"}, {n:"Luke Skywalker (Zbiornik Bacta)"}, {n:"Luke Skywalker (Pilot Śmigacza)"},
