@@ -1,52 +1,4 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEGO Zgadnij Kto To!</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: white; text-align: center; margin: 0; padding: 20px; }
-        h1 { color: #ffcc00; text-shadow: 2px 2px #000; }
-        
-        #menu { background: #333; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 3px solid #ffcc00; }
-        
-        /* Styl dla przycisków */
-        button { background: #444; color: white; border: 2px solid #ffcc00; padding: 10px 15px; margin: 5px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: bold; }
-        button:hover { background: #ffcc00; color: black; }
-        
-        /* Kluczowy styl dla obrazków - teraz będą widoczne! */
-        .card-img { 
-            width: 100%; 
-            height: 150px; 
-            background-size: contain; 
-            background-repeat: no-repeat; 
-            background-position: center;
-            background-color: #f0f0f0;
-            border-radius: 5px;
-        }
-
-        #target-display { background: #444; padding: 15px; border-radius: 10px; margin: 20px auto; max-width: 500px; border: 2px dashed #ffcc00; }
-        #target-name { color: #00ff00; font-size: 28px; margin: 10px 0; }
-
-        #character-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
-            gap: 15px; padding: 20px; max-width: 1200px; margin: 0 auto; 
-        }
-
-        .card { background: white; color: black; padding: 10px; border-radius: 10px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
-        .card.hidden { opacity: 0.15; filter: grayscale(100%) brightness(50%); transform: scale(0.95); }
-        .card p { margin: 10px 0 0; font-weight: bold; font-size: 13px; height: 35px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-
-        /* Dodatkowe pole dla znajomego */
-        .room-setup { margin-top: 15px; padding: 10px; border-top: 1px solid #555; }
-        input { padding: 8px; border-radius: 5px; border: none; width: 150px; text-align: center; }
-    </style>
-</head>
-<body>
-    <h1>LEGO Zgadnij Kto To</h1>
-
-   <div id="menu">
+<div id="menu">
     <button onclick="initGame('LEGO STAR WARS')">Star Wars</button>
     <button onclick="initGame('LEGO MARVEL / AVENGERS')">Marvel</button>
     <button onclick="initGame('LEGO HARRY POTTER')">Harry Potter</button>
@@ -62,42 +14,65 @@
     <hr>
     <button onclick="initGame('MIX')" style="background: orange; color: black; font-weight: bold;">TRYB MIX</button>
 
-    <div style="margin-top: 20px; padding: 15px; border: 2px dashed #ffcc00; border-radius: 10px; background: #444;">
-        <p style="margin: 0 0 10px 0; font-weight: bold;">Graj ze znajomym (ten sam kod = te same karty):</p>
-        <input type="text" id="room-input" placeholder="Wpisz dowolne hasło" 
-               style="padding: 10px; border-radius: 5px; border: none; width: 80%; text-align: center; font-size: 16px;">
+    <div style="margin-top: 20px; padding: 15px; border: 2px solid #ffcc00; border-radius: 10px; background: #2a2a2a;">
+        <p id="room-status" style="margin: 0 0 10px 0; color: #ffcc00; font-weight: bold;">TRYB SOLO</p>
+        
+        <input type="text" id="room-input" oninput="updateRoomStatus()" placeholder="Wpisz kod pokoju" 
+               style="padding: 10px; border-radius: 5px; border: none; width: 80%; text-align: center; font-size: 16px; background: #eee; color: black;">
+
+        <div id="share-section" style="display: none; margin-top: 10px;">
+            <p style="font-size: 12px; color: #00ff00; margin: 5px 0;">✓ Kod ustawiony! Wyślij go znajomemu.</p>
+            <button onclick="copyRoomLink()" style="background: #0088ff; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">Kopiuj link do pokoju</button>
+        </div>
     </div>
 </div>
 
-    <div id="game-area" style="display:none;">
-        <button onclick="backToMenu()" style="background: #666;">← Powrót do Menu</button>
-        <div id="target-display">
-            <p>Twoja postać do odgadnięcia:</p>
-            <h2 id="target-name">---</h2>
-        </div>
-        <div id="character-grid"></div>
+<div id="game-area" style="display:none;">
+    <button onclick="backToMenu()" style="background: #666;">← Powrót do Menu</button>
+    <div id="target-display">
+        <p>Twoja postać do odgadnięcia:</p>
+        <h2 id="target-name">---</h2>
     </div>
+    <div id="character-grid"></div>
+</div>
 
-    <script>
-        const db = {};
+<script>
+    const db = {}; // Twoja baza danych wypełni się poniżej
 
-        function getRandomCharacters(pool, count) {
-            let shuffled = [...pool];
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-            }
-            return shuffled.slice(0, count);
+    // Funkcje obsługi pokoju i kopiowania linków
+    function updateRoomStatus() {
+        const input = document.getElementById('room-input');
+        const status = document.getElementById('room-status');
+        const share = document.getElementById('share-section');
+
+        if (input.value.length > 0) {
+            status.innerText = "USTAWIANIE POKOJU: " + input.value.toUpperCase();
+            status.style.color = "#00ff00";
+            share.style.display = "block";
+        } else {
+            status.innerText = "TRYB SOLO";
+            status.style.color = "#ffcc00";
+            share.style.display = "none";
         }
+    }
 
-function initGame(category) {
+    function copyRoomLink() {
+        const code = document.getElementById('room-input').value;
+        const url = window.location.href.split('?')[0] + "?room=" + encodeURIComponent(code);
+        navigator.clipboard.writeText(url).then(() => {
+            alert("Link skopiowany! Wyślij go znajomemu.");
+        });
+    }
+
+    function initGame(category) {
         const menu = document.getElementById('menu');
         const gameArea = document.getElementById('game-area');
         const grid = document.getElementById('character-grid');
         const targetNameDisplay = document.getElementById('target-name');
         
-        // Pobieramy kod pokoju (jeśli wpisany)
-        const roomCode = document.getElementById('room-input')?.value || Math.random().toString();
+        // Pobieramy kod pokoju
+        const roomInput = document.getElementById('room-input');
+        const roomCode = (roomInput && roomInput.value.trim() !== "") ? roomInput.value.trim() : Math.random().toString();
         
         let characterPool = [];
         if (category === "MIX") {
@@ -107,36 +82,34 @@ function initGame(category) {
         }
 
         if (characterPool.length === 0) return alert("Błąd bazy danych!");
-
         grid.innerHTML = ''; 
 
-        // Funkcja mieszająca oparta na kodzie pokoju (Seed)
-        // Dzięki temu ze znajomym będziecie mieć te same postacie!
-        const seededRandom = (seed) => {
-            let x = Math.sin(seed++) * 10000;
-            return x - Math.floor(x);
-        };
-
+        // Mieszanie na podstawie kodu (Seed)
         let seed = 0;
         for(let i=0; i<roomCode.length; i++) seed += roomCode.charCodeAt(i);
+        const seededRandom = () => {
+            seed = (seed * 9301 + 49297) % 233280;
+            return seed / 233280;
+        };
 
-        let shuffled = [...characterPool].sort(() => seededRandom(seed++) - 0.5);
+        let shuffled = [...characterPool].sort(() => seededRandom() - 0.5);
         const selectedCharacters = shuffled.slice(0, 24);
 
-        // Losujemy cel (Twoją postać) - to akurat każdy ma inne!
         const targetCharacter = selectedCharacters[Math.floor(Math.random() * selectedCharacters.length)];
         targetNameDisplay.innerText = targetCharacter.n;
 
         selectedCharacters.forEach(char => {
-            // Zmieniony link na bardziej bezpośredni z Bing/DuckDuckGo
-            const query = encodeURIComponent("lego " + char.n + " minifigure");
-            const autoImgUrl = `https://www.bing.com/th?id=OIP.123&q=${query}&w=150&h=150&c=7&rs=1&p=0&dpr=1&pid=1.7`;
+            const searchName = char.n.replace(/\(.*\)/, '').trim();
+            const searchQuery = encodeURIComponent("lego " + searchName + " minifigure");
+            const imgUrl = `https://tse2.mm.bing.net/th?q=${searchQuery}&w=200&h=200&c=7&rs=1&p=0&dpr=1&pid=1.7`;
 
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
-                <div class="card-img" style="background-image: url('${autoImgUrl}'), url('https://via.placeholder.com/150?text=LEGO')"></div>
-                <p>${char.n}</p>
+                <div class="card-img" style="height: 140px; display: flex; align-items: center; justify-content: center; background: #eee; border-radius: 5px; overflow: hidden;">
+                    <img src="${imgUrl}" onerror="this.src='https://via.placeholder.com/150?text=LEGO'" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                </div>
+                <p style="margin-top: 8px; font-weight: bold; font-size: 12px; color: black;">${char.n}</p>
             `;
             card.onclick = () => card.classList.toggle('hidden');
             grid.appendChild(card);
@@ -146,11 +119,21 @@ function initGame(category) {
         gameArea.style.display = 'block';
     }
 
-        function backToMenu() {
-            document.getElementById('menu').style.display = 'block';
-            document.getElementById('game-area').style.display = 'none';
-        }
+    function backToMenu() {
+        document.getElementById('menu').style.display = 'block';
+        document.getElementById('game-area').style.display = 'none';
+    }
 
+    // Automatyczne wczytywanie kodu z linku
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomFromUrl = urlParams.get('room');
+        if (roomFromUrl) {
+            document.getElementById('room-input').value = roomFromUrl;
+            updateRoomStatus();
+        }
+    }
+</script>
         // --- TUTAJ ZACZYNAJĄ SIĘ TWOJE DANE ---
 
         db["LEGO STAR WARS"] = [
