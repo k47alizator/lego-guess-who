@@ -451,22 +451,51 @@
 ];
      // --- KONIEC BAZY DANYCH ---
 
-    // 1. NAPRAWIONA FUNKCJA LOSOWANIA
+    // 1. Funkcja aktualizująca wygląd po wpisaniu kodu
+    function updateRoomStatus() {
+        const input = document.getElementById('room-input');
+        const status = document.getElementById('room-status');
+        const share = document.getElementById('share-section');
+        const displayCode = document.getElementById('display-code');
+
+        if (input.value.trim().length > 0) {
+            const code = input.value.trim().toUpperCase();
+            status.innerText = "POKÓJ AKTYWNY";
+            status.style.color = "#00ff00";
+            displayCode.innerText = code;
+            share.style.display = "block";
+        } else {
+            status.innerText = "TRYB SOLO (WPISZ KOD)";
+            status.style.color = "#ffcc00";
+            share.style.display = "none";
+        }
+    }
+
+    // 2. Funkcja kopiowania linku do schowka
+    function copyRoomLink() {
+        const code = document.getElementById('room-input').value.trim();
+        const url = window.location.origin + window.location.pathname + "?room=" + encodeURIComponent(code);
+        
+        navigator.clipboard.writeText(url).then(() => {
+            alert("Skopiowano link do pokoju! Wyślij go znajomemu.");
+        });
+    }
+
+    // 3. Funkcja losowania (pomocnicza)
     function getRandomCharacters(pool, count) {
         let shuffled = [...pool].sort(() => 0.5 - Math.random());
         return shuffled.slice(0, count);
     }
 
-    // 2. NAPRAWIONA FUNKCJA GRY (Obsługuje zdjęcia i tryb pokoju)
+    // 4. GŁÓWNA LOGIKA GRY
     function initGame(category) {
         const menu = document.getElementById('menu');
         const gameArea = document.getElementById('game-area');
         const targetNameDisplay = document.getElementById('target-name');
         const grid = document.getElementById('character-grid');
         
-        // Pobieramy kod pokoju (np. Twoje "123")
         const roomInput = document.getElementById('room-input');
-        const roomCode = (roomInput && roomInput.value.trim() !== "") ? roomInput.value.trim() : Math.random().toString();
+        const roomCode = (roomInput && roomInput.value.trim() !== "") ? roomInput.value.trim().toUpperCase() : Math.random().toString();
         
         let characterPool = [];
         if (category === "MIX") {
@@ -476,11 +505,11 @@
         }
 
         if (characterPool.length === 0) {
-            alert("Błąd: Nie znaleziono kategorii " + category);
+            alert("Błąd: Nie znaleziono postaci!");
             return;
         }
 
-        // Mieszanie na podstawie kodu pokoju (żeby dwie osoby miały to samo)
+        // SEEDOWANIE (sprawia, że ten sam kod daje te same karty)
         let seed = 0;
         for(let i=0; i<roomCode.length; i++) seed += roomCode.charCodeAt(i);
         const seededRandom = () => {
@@ -488,18 +517,17 @@
             return seed / 233280;
         };
 
+        // Sortowanie z użyciem seeda
         let shuffled = [...characterPool].sort(() => seededRandom() - 0.5);
         const selectedCharacters = shuffled.slice(0, 24);
 
-        // Wybór postaci do odgadnięcia
+        // Wybór celu (każdy gracz dostaje inną postać do zgadnięcia, ale karty te same)
         const targetCharacter = selectedCharacters[Math.floor(Math.random() * selectedCharacters.length)];
         targetNameDisplay.innerText = targetCharacter.n;
 
         grid.innerHTML = ''; 
 
-        // Tworzenie kart z automatycznymi zdjęciami
         selectedCharacters.forEach(char => {
-            // Szukamy obrazka w Google/Bing na podstawie nazwy z Twojej bazy
             const searchQuery = encodeURIComponent("lego " + char.n + " minifigure");
             const imgUrl = `https://tse2.mm.bing.net/th?q=${searchQuery}&w=200&h=300&c=7&rs=1&p=0&dpr=1&pid=1.7`;
 
@@ -510,7 +538,6 @@
                 <p style="margin-top: 8px; font-weight: bold; font-size: 12px; color: black;">${char.n}</p>
             `;
             
-            // Kliknięcie ukrywa kartę (szarzeje)
             card.onclick = () => card.classList.toggle('hidden');
             grid.appendChild(card);
         });
@@ -524,13 +551,13 @@
         document.getElementById('game-area').style.display = 'none';
     }
 
-    // Automatyczne wczytywanie kodu z linku (jeśli ktoś wejdzie przez link)
+    // Automatyczne wczytywanie kodu z linku
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const roomFromUrl = urlParams.get('room');
         if (roomFromUrl) {
             document.getElementById('room-input').value = roomFromUrl;
-            if(typeof updateRoomStatus === "function") updateRoomStatus();
+            updateRoomStatus();
         }
     }
 </script>
