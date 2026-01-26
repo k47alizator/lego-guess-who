@@ -67,26 +67,20 @@
         <hr>
     <button onclick="initGame('MIX')" style="background: orange; color: black; font-weight: bold;">TRYB MIX</button>
 
-    <div style="margin-top: 20px; padding: 15px; border: 2px solid #ffcc00; border-radius: 10px; background: #2a2a2a;">
-        <p id="room-status" style="margin: 0 0 10px 0; color: #ffcc00; font-weight: bold;">TRYB SOLO</p>
-        
-        <input type="text" id="room-input" oninput="updateRoomStatus()" placeholder="Wpisz kod pokoju" 
-               style="padding: 10px; border-radius: 5px; border: none; width: 80%; text-align: center; font-size: 16px; background: #eee; color: black;">
+   <div style="margin-top: 20px; padding: 20px; border: 3px solid #ffcc00; border-radius: 15px; background: #2a2a2a; max-width: 500px; margin-left: auto; margin-right: auto;">
+    <p id="room-status" style="margin: 0 0 10px 0; color: #ffcc00; font-weight: bold; font-size: 18px;">USTAW POKÓJ DO GRY</p>
+    
+    <input type="text" id="room-input" oninput="updateRoomStatus()" placeholder="Wpisz dowolny kod (np. 123)" 
+           style="padding: 12px; border-radius: 8px; border: none; width: 90%; text-align: center; font-size: 20px; background: #fff; color: black; font-weight: bold; text-transform: uppercase;">
 
-        <div id="share-section" style="display: none; margin-top: 10px;">
-            <p style="font-size: 12px; color: #00ff00; margin: 5px 0;">✓ Kod ustawiony! Wyślij go znajomemu.</p>
-            <button onclick="copyRoomLink()" style="background: #0088ff; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">Kopiuj link do pokoju</button>
+    <div id="share-section" style="display: none; margin-top: 15px; border-top: 1px solid #444; padding-top: 15px;">
+        <p style="color: #00ff00; margin: 5px 0; font-size: 14px;">✓ Pokój aktywny!</p>
+        <div style="background: #444; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+            <span style="font-size: 12px; color: #bbb;">TWÓJ KOD DLA ZNAJOMEGO:</span><br>
+            <strong id="display-code" style="font-size: 24px; color: white; letter-spacing: 2px;">---</strong>
         </div>
+        <button onclick="copyRoomLink()" style="background: #0088ff; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;">Skopiuj link (opcjonalnie)</button>
     </div>
-</div>
-
-<div id="game-area" style="display:none;">
-    <button onclick="backToMenu()" style="background: #666;">← Powrót do Menu</button>
-    <div id="target-display">
-        <p>Twoja postać do odgadnięcia:</p>
-        <h2 id="target-name">---</h2>
-    </div>
-    <div id="character-grid"></div>
 </div>
 
 <script>
