@@ -1,5 +1,7 @@
 # 🧩 LEGO Guess Who - Zgadnij Kto To!
 
+### 🚀 Zagraj teraz: [KLIKNIJ TUTAJ, ABY OTWORZYĆ GRĘ](https://k47alizator.github.io/lego-guess-who/)
+
 Witaj w cyfrowej wersji klasycznej gry "Zgadnij kto to", ale w całości zbudowanej z figurek LEGO! Gra pozwala na wspólną zabawę ze znajomym przez internet, korzystając z unikalnych kodów pokoi.
 
 ---
