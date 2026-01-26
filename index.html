@@ -5,129 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LEGO Zgadnij Kto To!</title>
     <style>
-        /* STYLIZACJA WYGLĄDU */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a1a;
-            color: white;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-        }
-
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: white; text-align: center; margin: 0; padding: 20px; }
         h1 { color: #ffcc00; text-shadow: 2px 2px #000; }
-
-        #menu {
-            background: #333;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            border: 3px solid #ffcc00;
-        }
-
-        button {
-            background: #444;
-            color: white;
-            border: 2px solid #ffcc00;
-            padding: 10px 15px;
-            margin: 5px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 14px;
-        }
-
+        #menu { background: #333; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 3px solid #ffcc00; }
+        button { background: #444; color: white; border: 2px solid #ffcc00; padding: 10px 15px; margin: 5px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
         button:hover { background: #ffcc00; color: black; }
-
-        #target-display {
-            background: #444;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px auto;
-            max-width: 500px;
-            border: 2px dashed #ffcc00;
-        }
-
+        
+        #target-display { background: #444; padding: 15px; border-radius: 10px; margin: 20px auto; max-width: 500px; border: 2px dashed #ffcc00; }
         #target-name { color: #00ff00; font-size: 28px; margin: 10px 0; }
 
-        /* SIATKA POSTACI */
-        #board {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 15px;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
+        #character-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+            gap: 15px; padding: 20px; max-width: 1200px; margin: 0 auto; 
         }
 
-        /* KARTA POSTACI */
-        .card {
-            background: #fff;
-            color: #000;
-            padding: 10px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.2s, opacity 0.3s, filter 0.3s;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-        }
-
-        .card img {
-            width: 100%;
-            height: auto;
-            border-radius: 5px;
-            display: block;
-        }
-
-        .card p {
-            margin: 10px 0 0;
-            font-weight: bold;
-            font-size: 12px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* EFEKT ELIMINACJI */
-        .card.hidden {
-            opacity: 0.2;
-            filter: grayscale(100%) brightness(50%);
-            transform: scale(0.95);
-        }
+        .card { background: white; color: black; padding: 10px; border-radius: 10px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+        /* Klasa hidden musi pasować do tej w JS */
+        .card.hidden { opacity: 0.15; filter: grayscale(100%) brightness(50%); transform: scale(0.95); }
+        .card p { margin: 10px 0 0; font-weight: bold; font-size: 13px; }
     </style>
 </head>
 <body>
-
     <h1>LEGO Zgadnij Kto To</h1>
 
     <div id="menu">
         <button onclick="initGame('LEGO STAR WARS')">Star Wars</button>
-        <button onclick="initGame('LEGO MARVEL / AVENGERS')">Marvel / Avengers</button>
+        <button onclick="initGame('LEGO MARVEL / AVENGERS')">Marvel</button>
         <button onclick="initGame('LEGO HARRY POTTER')">Harry Potter</button>
-        <button onclick="initGame('LEGO BATMAN (1-3)')">Batman / DC</button>
-        <button onclick="initGame('LEGO LOTR / HOBBIT')">LOTR / Hobbit</button>
-        <button onclick="initGame('LEGO CITY UNDERCOVER')">LEGO City</button>
+        <button onclick="initGame('LEGO BATMAN (1-3)')">Batman</button>
+        <button onclick="initGame('LEGO LOTR / HOBBIT')">LOTR</button>
+        <button onclick="initGame('LEGO CITY UNDERCOVER')">City</button>
         <button onclick="initGame('LEGO INDIANA JONES')">Indiana Jones</button>
         <button onclick="initGame('LEGO PIRACI Z KARAIBÓW')">Piraci</button>
         <button onclick="initGame('LEGO JURASSIC WORLD')">Jurassic World</button>
-        <button onclick="initGame('LEGO PRZYGODA (1 i 2)')">LEGO Przygoda</button>
+        <button onclick="initGame('LEGO PRZYGODA (1 i 2)')">Przygoda</button>
         <button onclick="initGame('LEGO NINJAGO')">Ninjago</button>
         <button onclick="initGame('LEGO DIMENSIONS')">Dimensions</button>
         <hr>
-        <button onclick="initGame('MIX')" style="background: orange; color: black; font-weight: bold;">TRYB MIX (Wszystkie 1000+ postaci!)</button>
+        <button onclick="initGame('MIX')" style="background: orange; color: black; font-weight: bold;">TRYB MIX</button>
     </div>
 
-    <div id="target-display">
-        <p>Twoja postać do odgadnięcia (nie pokazuj nikomu!):</p>
-        <h2 id="target-name">Wybierz kategorię...</h2>
+    <div id="game-area" style="display:none;">
+        <button onclick="backToMenu()" style="background: #666;">← Powrót do Menu</button>
+        <div id="target-display">
+            <p>Twoja postać do odgadnięcia:</p>
+            <h2 id="target-name">---</h2>
+        </div>
+        <div id="character-grid"></div>
     </div>
-
-    <div id="board"></div>
 
     <script>
         const db = {};
 
-        // Funkcja mieszająca i wybierająca 30 postaci
         function getRandomCharacters(pool, count) {
             let shuffled = [...pool];
             for (let i = shuffled.length - 1; i > 0; i--) {
@@ -137,49 +67,48 @@
             return shuffled.slice(0, count);
         }
 
-        // Funkcja startująca grę
         function initGame(category) {
-            const board = document.getElementById('board');
+            const menu = document.getElementById('menu');
+            const gameArea = document.getElementById('game-area');
+            const grid = document.getElementById('character-grid'); // Poprawione ID
             const targetNameDisplay = document.getElementById('target-name');
             let characterPool = [];
 
-            // Budowanie puli postaci
             if (category === "MIX") {
-                Object.keys(db).forEach(key => {
-                    characterPool = characterPool.concat(db[key]);
-                });
+                Object.keys(db).forEach(key => { characterPool = characterPool.concat(db[key]); });
             } else if (db[category]) {
                 characterPool = [...db[category]];
             }
 
-            if (characterPool.length === 0) {
-                return alert("Błąd: Baza danych dla tej kategorii nie została jeszcze wklejona!");
-            }
+            if (characterPool.length === 0) return alert("Błąd: Brak danych!");
 
-            board.innerHTML = ''; // Czyścimy planszę
-
-            // 1. Losujemy 30 postaci na planszę
+            grid.innerHTML = ''; 
             const selectedCharacters = getRandomCharacters(characterPool, 30);
-
-            // 2. Losujemy cel spośród wylosowanych 30 kart
             const targetCharacter = selectedCharacters[Math.floor(Math.random() * selectedCharacters.length)];
             targetNameDisplay.innerText = targetCharacter.n;
 
-            // 3. Tworzymy karty
             selectedCharacters.forEach(char => {
+                const autoImgUrl = `https://external-content.duckduckgo.com/iu/?u=https://tse1.mm.bing.net/th?q=lego+minifigure+${encodeURIComponent(char.n)}`;
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <img src="images/${char.img}" onerror="this.src='https://via.placeholder.com/150?text=LEGO'" alt="${char.n}">
+                    <div style="height: 140px; display: flex; align-items: center; justify-content: center;">
+                        <img src="${autoImgUrl}" onerror="this.src='https://via.placeholder.com/150?text=LEGO'" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                    </div>
                     <p>${char.n}</p>
                 `;
-                
                 card.onclick = () => card.classList.toggle('hidden');
-                board.appendChild(card);
+                grid.appendChild(card);
             });
 
-            // Przewijanie do planszy
-            window.scrollTo({ top: document.getElementById('target-display').offsetTop - 20, behavior: 'smooth' });
+            menu.style.display = 'none';
+            gameArea.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function backToMenu() {
+            document.getElementById('menu').style.display = 'block';
+            document.getElementById('game-area').style.display = 'none';
         }
 
         // --- TUTAJ ZACZYNAJĄ SIĘ TWOJE DANE ---
@@ -450,55 +379,60 @@
     // --- LEGO DIMENSIONS SPECIALS ---
     {n:"Vorton", img:"ld48.jpg"}, {n:"X-PO", img:"ld49.jpg"}, {n:"Lord Vortech", img:"ld50.jpg"}, {n:"Portal Chell", img:"ld51.jpg"}, {n:"Wheatley", img:"ld52.jpg"}, {n:"GLaDOS", img:"ld53.jpg"}, {n:"Cave Johnson", img:"ld54.jpg"}, {n:"B.A. Baracus (A-Team)", img:"ld55.jpg"}, {n:"Michael Knight", img:"ld56.jpg"}, {n:"K.I.T.T.", img:"ld57.jpg"}, {n:"Mission Impossible Ethan Hunt", img:"ld58.jpg"}, {n:"Powerpuff Girls Blossom", img:"ld59.jpg"}, {n:"Powerpuff Girls Bubbles", img:"ld60.jpg"}, {n:"Powerpuff Girls Buttercup", img:"ld61.jpg"}, {n:"Mojo Jojo", img:"ld62.jpg"}, {n:"Teen Titans Robin", img:"ld63.jpg"}, {n:"Teen Titans Beast Boy", img:"ld64.jpg"}, {n:"Teen Titans Raven", img:"ld65.jpg"}, {n:"Starfire", img:"ld66.jpg"}, {n:"Cyborg (Teen Titans)", img:"ld67.jpg"}, {n:"Excalibur Batman", img:"ld68.jpg"}, {n:"Buttersworth", img:"ld69.jpg"}, {n:"Lord Greystoke", img:"ld70.jpg"}, {n:"Zane (Dimensions)", img:"ld71.jpg"}, {n:"Cole (Dimensions)", img:"ld72.jpg"}, {n:"Jay (Dimensions)", img:"ld73.jpg"}, {n:"Kai (Dimensions)", img:"ld74.jpg"}, {n:"Nya (Dimensions)", img:"ld75.jpg"}
 ];
-        // --- KONIEC BAZY DANYCH ---
+      // --- KONIEC BAZY DANYCH ---
 
-    // Funkcja inicjująca grę dla wybranej kategorii
-    function initGame(category) {
-        const menu = document.getElementById('menu');
-        const gameArea = document.getElementById('game-area');
-        let characterPool = [];
+  // Funkcja inicjująca grę dla wybranej kategorii
+  function initGame(category) {
+      const menu = document.getElementById('menu');
+      const gameArea = document.getElementById('game-area');
+      const targetName = document.getElementById('target-name');
+      const grid = document.getElementById('character-grid');
+      let pool = [];
 
-        if (category === 'MIX') {
-            // Łączy wszystkie kategorie w jedną wielką pulę
-            Object.values(db).forEach(cat => {
-                characterPool = characterPool.concat(cat);
-            });
-        } else {
-            characterPool = db[category];
-        }
+      // Sprawdzamy czy kategoria istnieje w bazie db
+      if (category === 'MIX') {
+          Object.values(db).forEach(cat => pool = pool.concat(cat));
+      } else {
+          pool = db[category];
+      }
 
-        // Losowanie 30 postaci z puli
-        const selectedCharacters = getRandomCharacters(characterPool, 30);
-        
-        // Renderowanie kart na ekranie
-        const grid = document.getElementById('character-grid');
-        grid.innerHTML = '';
-        
-        selectedCharacters.forEach(char => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <div class="card-img" style="background-image: url('${char.img}')"></div>
-                <div class="card-name">${char.n}</div>
-            `;
-            // Funkcja eliminacji postaci (zakrywanie)
-            card.onclick = function() {
-                this.classList.toggle('eliminated');
-            };
-            grid.appendChild(card);
-        });
+      if (!pool || pool.length === 0) {
+          alert("Błąd: Nie znaleziono postaci w tej kategorii!");
+          return;
+      }
 
-        // Przełączanie widoku
-        menu.style.display = 'none';
-        gameArea.style.display = 'block';
-    }
+      // Losowanie 30 postaci i celu
+      const selected = getRandomCharacters(pool, 30);
+      const target = selected[Math.floor(Math.random() * selected.length)];
+      
+      targetName.innerText = target.n;
+      grid.innerHTML = '';
 
-    // Funkcja powrotu do menu
-    function backToMenu() {
-        document.getElementById('menu').style.display = 'block';
-        document.getElementById('game-area').style.display = 'none';
-    }
+      // Tworzenie kart
+      selected.forEach(char => {
+          const autoImg = `https://external-content.duckduckgo.com/iu/?u=https://tse1.mm.bing.net/th?q=lego+minifigure+${encodeURIComponent(char.n)}`;
+          
+          const card = document.createElement('div');
+          card.className = 'card'; // Ważne: musi być taka sama klasa jak w CSS
+          card.innerHTML = `
+              <div class="card-img" style="background-image: url('${autoImg}')"></div>
+              <p>${char.n}</p>
+          `;
+          
+          // Zmieniamy na 'hidden', bo taką klasę masz w stylach CSS
+          card.onclick = () => card.classList.toggle('hidden'); 
+          
+          grid.appendChild(card);
+      });
+
+      menu.style.display = 'none';
+      gameArea.style.display = 'block';
+  }
+
+  function backToMenu() {
+      document.getElementById('menu').style.display = 'block';
+      document.getElementById('game-area').style.display = 'none';
+  }
 </script>
-
 </body>
 </html>
