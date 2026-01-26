@@ -660,6 +660,13 @@ db["LEGO STAR WARS"] = [
     
     // --- KONIEC BAZY DANYCH ---
 
+    // 0. KONFIGURACJA TWOJEGO GITHUBA
+    const githubConfig = {
+        user: "k47alizator",
+        repo: "lego-guess-who",
+        folder: "img"
+    };
+
     // 1. FUNKCJE OBSŁUGI POKOJU
     function createGame() {
         const randomCode = "LEGO-" + Math.floor(100 + Math.random() * 899);
@@ -707,7 +714,6 @@ db["LEGO STAR WARS"] = [
         const targetNameDisplay = document.getElementById('target-name');
         const grid = document.getElementById('character-grid');
         
-        // Pobieramy kod z wyświetlacza lobby
         const displayCode = document.getElementById('display-code');
         const roomCode = (displayCode && displayCode.innerText !== "") ? displayCode.innerText : "SOLO";
         
@@ -723,7 +729,7 @@ db["LEGO STAR WARS"] = [
             return;
         }
 
-        // SEEDOWANIE (żeby obaj gracze mieli to samo)
+        // SEEDOWANIE
         let seed = 0;
         for(let i=0; i<roomCode.length; i++) seed += roomCode.charCodeAt(i);
         const seededRandom = () => {
@@ -731,11 +737,9 @@ db["LEGO STAR WARS"] = [
             return seed / 233280;
         };
 
-        // Mieszanie kart - zawsze tak samo dla tego samego kodu
         let shuffled = [...characterPool].sort(() => seededRandom() - 0.5);
         const selectedCharacters = shuffled.slice(0, 24);
 
-        // LOSOWANIE CELU - NAPRAWIONE (używa seededRandom)
         const targetIndex = Math.floor(seededRandom() * selectedCharacters.length);
         const targetCharacter = selectedCharacters[targetIndex];
         targetNameDisplay.innerText = targetCharacter.n;
@@ -743,17 +747,44 @@ db["LEGO STAR WARS"] = [
         grid.innerHTML = ''; 
 
         selectedCharacters.forEach(char => {
-            // Czyścimy nazwę do wyszukiwarki (usuwamy tekst w nawiasach)
-            const cleanName = char.n.replace(/\(.*\)/, '').trim();
-            const searchQuery = encodeURIComponent("lego " + cleanName + " minifigure");
-            const imgUrl = `https://tse2.mm.bing.net/th?q=${searchQuery}&w=200&h=300&c=7&rs=1&p=0&dpr=1&pid=1.7`;
-
             const card = document.createElement('div');
             card.className = 'card';
+            
+            // Ścieżki obrazków
+            const fileName = encodeURIComponent(char.n) + ".jpg";
+            const urlGithub = `https://raw.githubusercontent.com/${githubConfig.user}/${githubConfig.repo}/main/${githubConfig.folder}/${fileName}`;
+            const cleanName = char.n.replace(/\(.*\)/, '').trim();
+            const urlInternet = `https://tse2.mm.bing.net/th?q=lego+${encodeURIComponent(cleanName)}+minifigure&w=200&h=300&c=7&rs=1&p=0&dpr=1&pid=1.7`;
+
             card.innerHTML = `
-                <div class="card-img" style="background-image: url('${imgUrl}'); background-size: contain; background-repeat: no-repeat; background-position: center; height: 140px; background-color: #f0f0f0; border-radius: 5px;"></div>
-                <p style="margin-top: 8px; font-weight: bold; font-size: 12px; color: black;">${char.n}</p>
+                <div class="card-img-wrapper" style="position: relative; height: 140px; background: #f0f0f0; border-radius: 5px; overflow: hidden;">
+                    <img class="main-img" src="${urlGithub}" style="width: 100%; height: 100%; object-fit: contain;">
+                    <button class="dl-btn" style="display:none; position: absolute; bottom: 0; width: 100%; background: rgba(40, 167, 69, 0.9); color: white; border: none; font-size: 10px; padding: 5px; cursor: pointer; font-weight: bold;">📥 ZAPISZ DO IMG</button>
+                </div>
+                <p style="margin-top: 8px; font-weight: bold; font-size: 12px; color: black; line-height: 1.2;">${char.n}</p>
             `;
+
+            const imgTag = card.querySelector('.main-img');
+            const dlBtn = card.querySelector('.dl-btn');
+
+            // Jeśli nie ma na GitHubie -> ładuj z sieci i pokaż przycisk pobierania
+            imgTag.onerror = function() {
+                if (imgTag.src !== urlInternet) {
+                    imgTag.src = urlInternet;
+                    dlBtn.style.display = "block";
+                }
+            };
+
+            // Pobieranie zdjęcia
+            dlBtn.onclick = (e) => {
+                e.stopPropagation(); // Żeby nie zakryło karty
+                const link = document.createElement('a');
+                link.href = urlInternet;
+                link.download = char.n + ".jpg";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
             
             card.onclick = () => card.classList.toggle('hidden');
             grid.appendChild(card);
@@ -765,11 +796,9 @@ db["LEGO STAR WARS"] = [
     }
 
     function backToMenu() {
-        // Najprostszy reset gry
         location.reload();
     }
 
-    // 4. START Z LINKU
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const roomFromUrl = urlParams.get('room');
