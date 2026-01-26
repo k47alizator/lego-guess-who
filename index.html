@@ -3,31 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEGO Zgadnij Kto To</title>
+    <title>LEGO Zgadnij Kto To!</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #222; color: white; text-align: center; }
-        #menu { margin: 20px; }
-        button { padding: 10px 15px; margin: 5px; cursor: pointer; background: #e6bc15; border: none; font-weight: bold; border-radius: 5px; }
-        button:hover { background: #ffcc00; }
-        #board { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
-            gap: 15px; 
-            padding: 20px; 
-            max-width: 1200px; 
-            margin: 0 auto; 
+        /* STYLIZACJA WYGLĄDU */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
         }
-        .card { 
-            background: #444; 
-            padding: 10px; 
-            border-radius: 10px; 
-            border: 3px solid #555; 
+
+        h1 { color: #ffcc00; text-shadow: 2px 2px #000; }
+
+        #menu {
+            background: #333;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 3px solid #ffcc00;
+        }
+
+        button {
+            background: #444;
+            color: white;
+            border: 2px solid #ffcc00;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 8px;
             cursor: pointer;
+            transition: 0.3s;
+            font-size: 14px;
         }
-        .card img { width: 100%; border-radius: 5px; display: block; }
-        .card p { margin-top: 10px; font-size: 14px; font-weight: bold; }
-        .hidden { opacity: 0.2; grayscale: 100%; }
-        #target-display { margin: 20px; padding: 20px; background: #333; border-radius: 10px; display: inline-block; }
+
+        button:hover { background: #ffcc00; color: black; }
+
+        #target-display {
+            background: #444;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 500px;
+            border: 2px dashed #ffcc00;
+        }
+
+        #target-name { color: #00ff00; font-size: 28px; margin: 10px 0; }
+
+        /* SIATKA POSTACI */
+        #board {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* KARTA POSTACI */
+        .card {
+            background: #fff;
+            color: #000;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.3s, filter 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            display: block;
+        }
+
+        .card p {
+            margin: 10px 0 0;
+            font-weight: bold;
+            font-size: 12px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* EFEKT ELIMINACJI */
+        .card.hidden {
+            opacity: 0.2;
+            filter: grayscale(100%) brightness(50%);
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body>
@@ -35,7 +101,6 @@
     <h1>LEGO Zgadnij Kto To</h1>
 
     <div id="menu">
-        <h1>LEGO Zgadnij Kto To!</h1>
         <button onclick="initGame('LEGO STAR WARS')">Star Wars</button>
         <button onclick="initGame('LEGO MARVEL / AVENGERS')">Marvel / Avengers</button>
         <button onclick="initGame('LEGO HARRY POTTER')">Harry Potter</button>
@@ -49,7 +114,7 @@
         <button onclick="initGame('LEGO NINJAGO')">Ninjago</button>
         <button onclick="initGame('LEGO DIMENSIONS')">Dimensions</button>
         <hr>
-        <button onclick="initGame('MIX')" style="background: orange; font-weight: bold;">TRYB MIX (Wszystkie 1000+ postaci!)</button>
+        <button onclick="initGame('MIX')" style="background: orange; color: black; font-weight: bold;">TRYB MIX (Wszystkie 1000+ postaci!)</button>
     </div>
 
     <div id="target-display">
@@ -60,46 +125,65 @@
     <div id="board"></div>
 
     <script>
-        const db = {}; // Tutaj będą trafiać postacie, które wyślę w kolejnych wiadomościach
+        const db = {};
 
-        // Funkcja losująca postacie
-        function getRandomCharacters(category) {
-            let pool = [];
-            if (category === "MIX") {
-                Object.keys(db).forEach(key => { pool = pool.concat(db[key]); });
-            } else if (db[category]) {
-                pool = [...db[category]];
-            }
-            
-            // Mieszanie
-            for (let i = pool.length - 1; i > 0; i--) {
+        // Funkcja mieszająca i wybierająca 30 postaci
+        function getRandomCharacters(pool, count) {
+            let shuffled = [...pool];
+            for (let i = shuffled.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [pool[i], pool[j]] = [pool[j], pool[i]];
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
             }
-            return pool.slice(0, 30);
+            return shuffled.slice(0, count);
         }
 
-        // Funkcja inicjująca grę
+        // Funkcja startująca grę
         function initGame(category) {
             const board = document.getElementById('board');
+            const targetNameDisplay = document.getElementById('target-name');
+            let characterPool = [];
+
+            // Budowanie puli postaci
+            if (category === "MIX") {
+                Object.keys(db).forEach(key => {
+                    characterPool = characterPool.concat(db[key]);
+                });
+            } else if (db[category]) {
+                characterPool = [...db[category]];
+            }
+
+            if (characterPool.length === 0) {
+                return alert("Błąd: Baza danych dla tej kategorii nie została jeszcze wklejona!");
+            }
+
             board.innerHTML = ''; // Czyścimy planszę
-            
-            const characters = getRandomCharacters(category);
-            if (characters.length === 0) return alert("Brak postaci w tej kategorii!");
 
-            // Losujemy postać celu
-            const target = characters[Math.floor(Math.random() * characters.length)];
-            document.getElementById('target-name').innerText = target.n;
+            // 1. Losujemy 30 postaci na planszę
+            const selectedCharacters = getRandomCharacters(characterPool, 30);
 
-            // Tworzymy kafelki
-            characters.forEach(char => {
+            // 2. Losujemy cel spośród wylosowanych 30 kart
+            const targetCharacter = selectedCharacters[Math.floor(Math.random() * selectedCharacters.length)];
+            targetNameDisplay.innerText = targetCharacter.n;
+
+            // 3. Tworzymy karty
+            selectedCharacters.forEach(char => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.innerHTML = `<img src="images/${char.img}" alt="${char.n}"><p>${char.n}</p>`;
+                card.innerHTML = `
+                    <img src="images/${char.img}" onerror="this.src='https://via.placeholder.com/150?text=LEGO'" alt="${char.n}">
+                    <p>${char.n}</p>
+                `;
+                
                 card.onclick = () => card.classList.toggle('hidden');
                 board.appendChild(card);
             });
+
+            // Przewijanie do planszy
+            window.scrollTo({ top: document.getElementById('target-display').offsetTop - 20, behavior: 'smooth' });
         }
+
+        // --- TUTAJ ZACZYNAJĄ SIĘ TWOJE DANE ---
+
         db["LEGO STAR WARS"] = [
     // --- LUKE SKYWALKER ---
     {n:"Luke Skywalker (Tatooine)", img:"ls1.jpg"}, {n:"Luke Skywalker (X-Wing)", img:"ls2.jpg"}, {n:"Luke Skywalker (Bespin)", img:"ls3.jpg"}, {n:"Luke Skywalker (Dagobah)", img:"ls4.jpg"}, {n:"Luke Skywalker (Jedi Knight)", img:"ls5.jpg"}, {n:"Luke Skywalker (Endor)", img:"ls6.jpg"}, {n:"Luke Skywalker (Stormtrooper)", img:"ls7.jpg"}, {n:"Luke Skywalker (Hoth)", img:"ls8.jpg"}, {n:"Luke Skywalker (Ceremony)", img:"ls9.jpg"}, {n:"Luke Skywalker (Old - Ahch-To)", img:"ls10.jpg"}, {n:"Luke Skywalker (Crait)", img:"ls11.jpg"}, {n:"Luke Skywalker (Force Ghost)", img:"ls12.jpg"}, {n:"Luke Skywalker (Bacta Tank)", img:"ls13.jpg"}, {n:"Luke Skywalker (Snowspeeder)", img:"ls14.jpg"},
