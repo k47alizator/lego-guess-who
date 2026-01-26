@@ -186,7 +186,7 @@
             updateRoomStatus();
         }
     }
-</script>
+
         // --- TUTAJ ZACZYNAJĄ SIĘ TWOJE DANE ---
 
         db["LEGO STAR WARS"] = [
@@ -456,7 +456,9 @@
     {n:"Vorton", img:"ld48.jpg"}, {n:"X-PO", img:"ld49.jpg"}, {n:"Lord Vortech", img:"ld50.jpg"}, {n:"Portal Chell", img:"ld51.jpg"}, {n:"Wheatley", img:"ld52.jpg"}, {n:"GLaDOS", img:"ld53.jpg"}, {n:"Cave Johnson", img:"ld54.jpg"}, {n:"B.A. Baracus (A-Team)", img:"ld55.jpg"}, {n:"Michael Knight", img:"ld56.jpg"}, {n:"K.I.T.T.", img:"ld57.jpg"}, {n:"Mission Impossible Ethan Hunt", img:"ld58.jpg"}, {n:"Powerpuff Girls Blossom", img:"ld59.jpg"}, {n:"Powerpuff Girls Bubbles", img:"ld60.jpg"}, {n:"Powerpuff Girls Buttercup", img:"ld61.jpg"}, {n:"Mojo Jojo", img:"ld62.jpg"}, {n:"Teen Titans Robin", img:"ld63.jpg"}, {n:"Teen Titans Beast Boy", img:"ld64.jpg"}, {n:"Teen Titans Raven", img:"ld65.jpg"}, {n:"Starfire", img:"ld66.jpg"}, {n:"Cyborg (Teen Titans)", img:"ld67.jpg"}, {n:"Excalibur Batman", img:"ld68.jpg"}, {n:"Buttersworth", img:"ld69.jpg"}, {n:"Lord Greystoke", img:"ld70.jpg"}, {n:"Zane (Dimensions)", img:"ld71.jpg"}, {n:"Cole (Dimensions)", img:"ld72.jpg"}, {n:"Jay (Dimensions)", img:"ld73.jpg"}, {n:"Kai (Dimensions)", img:"ld74.jpg"}, {n:"Nya (Dimensions)", img:"ld75.jpg"}
 ];
       // --- KONIEC BAZY DANYCH ---
-
+function getRandomCharacters(pool, count) {
+    let shuffled = [...pool].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
   // Funkcja inicjująca grę dla wybranej kategorii
   function initGame(category) {
       const menu = document.getElementById('menu');
