@@ -9,14 +9,14 @@
             --lego-yellow: #FFD500;
             --lego-red: #E3000B;
             --lego-blue: #006CB7;
+            --bg-dark: #1a1a1a;
         }
 
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #1a1a1a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
             color: white;
             margin: 0;
-            padding: 0;
             text-align: center;
         }
 
@@ -24,7 +24,7 @@
 
         .character-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 15px;
             max-width: 1200px;
             margin: 20px auto;
@@ -36,16 +36,16 @@
             padding: 10px;
             cursor: pointer;
             transition: transform 0.2s, opacity 0.3s;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
-        .card:hover { transform: scale(1.05); }
+        .card:hover { transform: scale(1.03); }
 
         .card.hidden {
-            opacity: 0.15;
+            opacity: 0.1;
             filter: grayscale(1);
             transform: scale(0.9);
-            cursor: default;
+            pointer-events: none;
         }
 
         .btn {
@@ -61,8 +61,6 @@
             box-shadow: 0 4px #900;
         }
 
-        .btn:active { transform: translateY(2px); box-shadow: 0 2px #900; }
-
         .cat-btn {
             background: var(--lego-blue);
             color: white;
@@ -71,7 +69,7 @@
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         input {
@@ -93,44 +91,55 @@
             display: inline-block;
             margin-bottom: 20px;
         }
+
+        .dl-btn {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: rgba(40, 167, 69, 0.95);
+            color: white;
+            border: none;
+            font-size: 9px;
+            padding: 6px 2px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 20;
+        }
     </style>
 </head>
 <body>
 
 <div id="menu">
-    <h1 style="color: var(--lego-yellow); font-size: 40px; text-shadow: 2px 2px #000;">🧩 LEGO GUESS WHO</h1>
+    <h1 style="color: var(--lego-yellow); text-shadow: 2px 2px #000;">🧩 LEGO GUESS WHO</h1>
     
     <div id="setup-view">
-        <button class="btn" onclick="createGame()">STWÓRZ NOWY POKÓJ</button>
-        <div style="margin: 30px 0;">
-            <p>LUB DOŁĄCZ DO ZNAJOMEGO:</p>
-            <input type="text" id="room-input" placeholder="Wpisz kod pokoju...">
+        <button class="btn" onclick="createGame()">NOWY POKÓJ</button>
+        <div style="margin: 25px 0;">
+            <p style="color: #ccc;">WPISZ KOD OD ZNAJOMEGO:</p>
+            <input type="text" id="room-input" placeholder="np. LEGO-123">
             <button class="btn" style="background: var(--lego-blue); box-shadow: 0 4px #004a7c;" onclick="joinGame()">DOŁĄCZ</button>
         </div>
     </div>
 
     <div id="lobby-view" style="display: none; margin-top: 20px;">
         <div style="background: #333; padding: 20px; border-radius: 15px; border: 2px solid #00ff00; display: inline-block;">
-            <p style="margin: 0; color: #bbb;">KOD TWOJEGO POKOJU:</p>
-            <h2 id="display-code" style="margin: 10px 0; font-size: 45px; font-family: monospace; color: white; letter-spacing: 3px;">---</h2>
-            <button onclick="copyRoomLink()" style="font-size: 12px; background: #555; color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer;">📋 Skopiuj Link</button>
+            <p style="margin: 0; color: #bbb;">KOD POKOJU:</p>
+            <h2 id="display-code" style="margin: 10px 0; font-size: 40px; font-family: monospace; color: white;">---</h2>
+            <button onclick="copyRoomLink()" style="font-size: 11px; background: #555; color: white; border: none; padding: 6px; border-radius: 4px; cursor: pointer;">Skopiuj Link</button>
         </div>
-
-        <h3 style="margin: 30px 0;">Wybierz kategorię gry:</h3>
-        <div id="category-buttons" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 900px; margin: 0 auto;"></div>
+        <h3 style="margin: 25px 0;">Wybierz kategorię:</h3>
+        <div id="category-buttons" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 900px; margin: 0 auto;"></div>
     </div>
 </div>
 
 <div id="game-area" style="display: none;">
     <div class="target-box">
-        <p style="margin: 0; color: #aaa; font-weight: bold;">TWOJA POSTAĆ:</p>
-        <h2 id="target-name" style="margin: 5px 0; color: var(--lego-yellow); font-size: 28px;">---</h2>
+        <p style="margin: 0; color: #aaa; font-size: 14px;">TWOJA POSTAĆ:</p>
+        <h2 id="target-name" style="margin: 5px 0; color: var(--lego-yellow);">---</h2>
     </div>
-    
     <div style="margin-bottom: 20px;">
-        <button onclick="backToMenu()" style="background: #e3000b; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">ZAKOŃCZ GRĘ</button>
+        <button onclick="location.reload()" style="background: #555; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">Wyjdź do Menu</button>
     </div>
-
     <div id="character-grid" class="character-grid"></div>
 </div>
 
