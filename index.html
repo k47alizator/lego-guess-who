@@ -322,26 +322,17 @@ function createGame() {
         generateCategoryButtons();
     }
 
-    function copyRoomLink() {
-        const code = document.getElementById('display-code').innerText;
-        const url = window.location.origin + window.location.pathname + "?room=" + code;
-        navigator.clipboard.writeText(url).then(() => alert("Link skopiowany!"));
-    }
-
     function generateCategoryButtons() {
         const container = document.getElementById('category-buttons');
         container.innerHTML = '';
         
-        // Przycisk MIX
         const mixBtn = document.createElement('button');
         mixBtn.className = 'cat-btn';
-        mixBtn.style.background = 'orange';
-        mixBtn.style.color = 'black';
+        mixBtn.style.background = 'orange'; mixBtn.style.color = 'black';
         mixBtn.innerText = '🔥 TRYB MIX';
         mixBtn.onclick = () => initGame('MIX');
         container.appendChild(mixBtn);
 
-        // Reszta kategorii
         Object.keys(db).forEach(cat => {
             const btn = document.createElement('button');
             btn.className = 'cat-btn';
@@ -353,14 +344,9 @@ function createGame() {
 
     function initGame(category) {
         const roomCode = document.getElementById('display-code').innerText;
-        let pool = [];
-        if (category === 'MIX') {
-            Object.values(db).forEach(list => pool = pool.concat(list));
-        } else {
-            pool = [...db[category]];
-        }
+        let pool = (category === 'MIX') ? [].concat(...Object.values(db)) : [...db[category]];
 
-        // --- SEEDOWANIE PLANSZY (Synchronizacja układu) ---
+        // SEED PLANSZY
         let boardSeed = 0;
         for(let i=0; i<roomCode.length; i++) boardSeed += roomCode.charCodeAt(i);
         const seededRandom = () => {
@@ -368,11 +354,11 @@ function createGame() {
             return boardSeed / 233280;
         };
 
-        // Mieszamy karty seedem (każdy ma te same 24 karty)
+        // Mieszanie planszy (tak samo dla obu graczy)
         let shuffled = pool.sort(() => seededRandom() - 0.5);
         const selected = shuffled.slice(0, 24);
 
-        // --- LOSOWANIE TWOJEJ POSTACI (Różna dla każdego gracza) ---
+        // Losowanie twojej postaci (inaczej dla każdego)
         const target = selected[Math.floor(Math.random() * 24)];
         document.getElementById('target-name').innerText = target.n;
 
@@ -389,15 +375,28 @@ function createGame() {
             const urlInternet = `https://tse2.mm.bing.net/th?q=lego+${encodeURIComponent(cleanName)}+minifigure&w=200&h=300&c=7&rs=1&p=0&dpr=1&pid=1.7`;
 
             card.innerHTML = `
-                <div style="height: 140px; display: flex; align-items: center; justify-content: center; background: #f9f9f9; border-radius: 5px; overflow: hidden;">
+                <div style="position: relative; height: 140px; background: #f0f0f0; border-radius: 5px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
                     <img class="main-img" src="${urlGithub}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                    <button class="dl-btn" style="display:none;">📥 ZAPISZ DO IMG</button>
                 </div>
-                <p style="color:black; font-size:11px; font-weight:bold; margin:8px 0 0 0; min-height: 25px;">${char.n}</p>
+                <p style="color:black; font-size:11px; font-weight:bold; margin-top:8px;">${char.n}</p>
             `;
 
             const imgTag = card.querySelector('.main-img');
+            const dlBtn = card.querySelector('.dl-btn');
+
             imgTag.onerror = function() {
-                if (this.src !== urlInternet) this.src = urlInternet;
+                if (this.src !== urlInternet) {
+                    this.src = urlInternet;
+                    dlBtn.style.display = "block";
+                }
+            };
+
+            dlBtn.onclick = (e) => {
+                e.stopPropagation();
+                const link = document.createElement('a');
+                link.href = urlInternet; link.download = char.n + ".jpg";
+                link.click();
             };
             
             card.onclick = () => card.classList.toggle('hidden');
@@ -408,16 +407,17 @@ function createGame() {
         document.getElementById('game-area').style.display = 'block';
     }
 
-    function backToMenu() { location.reload(); }
+    function copyRoomLink() {
+        const code = document.getElementById('display-code').innerText;
+        const url = window.location.origin + window.location.pathname + "?room=" + code;
+        navigator.clipboard.writeText(url).then(() => alert("Skopiowano link!"));
+    }
 
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const room = urlParams.get('room');
-        if (room) {
-            document.getElementById('room-input').value = room;
-            enterLobby(room);
-        }
+        if (room) { document.getElementById('room-input').value = room; enterLobby(room); }
     }
 </script>
 </body>
-</html>   
+</html>
