@@ -3,83 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEGO Zgadnij Kto To!</title>
+    <title>LEGO Guess Who - Online</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: #1a1a1a; color: white; text-align: center; margin: 0; padding: 20px; 
+        :root {
+            --lego-yellow: #FFD500;
+            --lego-red: #E3000B;
+            --lego-blue: #006CB7;
         }
-        h1 { color: #ffcc00; text-shadow: 2px 2px #000; }
-        #menu { 
-            background: #333; padding: 20px; border-radius: 15px; 
-            margin: 0 auto 20px auto; border: 3px solid #ffcc00; max-width: 800px;
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: white;
+            margin: 0;
+            padding: 0;
+            text-align: center;
         }
-        button { 
-            background: #444; color: white; border: 2px solid #ffcc00; 
-            padding: 10px 15px; margin: 5px; border-radius: 8px; 
-            cursor: pointer; transition: 0.3s; font-weight: bold;
+
+        #menu, #game-area { padding: 20px; }
+
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 15px;
+            max-width: 1200px;
+            margin: 20px auto;
         }
-        button:hover { background: #ffcc00; color: black; }
-        #character-grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
-            gap: 15px; padding: 20px; max-width: 1200px; margin: 0 auto; 
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
         }
-        .card { 
-            background: white; color: black; padding: 10px; border-radius: 10px; 
-            cursor: pointer; transition: 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.5); 
+
+        .card:hover { transform: scale(1.05); }
+
+        .card.hidden {
+            opacity: 0.15;
+            filter: grayscale(1);
+            transform: scale(0.9);
+            cursor: default;
         }
-        .card.hidden { opacity: 0.15; filter: grayscale(100%) brightness(50%); }
+
+        .btn {
+            background: var(--lego-red);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            box-shadow: 0 4px #900;
+        }
+
+        .btn:active { transform: translateY(2px); box-shadow: 0 2px #900; }
+
         .cat-btn {
-            padding: 12px 18px; background: #444; color: white; border: 2px solid #555;
-            border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.2s ease;
-            min-width: 140px;
+            background: var(--lego-blue);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
         }
-        .cat-btn:hover { background: #00ff00; color: black; transform: scale(1.05); }
+
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 2px solid var(--lego-yellow);
+            width: 200px;
+            text-align: center;
+            background: #333;
+            color: white;
+        }
+
+        .target-box {
+            background: #333;
+            padding: 15px;
+            border-radius: 15px;
+            border: 3px solid var(--lego-yellow);
+            display: inline-block;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <div id="menu">
-        <h1 style="font-size: 3em; margin-bottom: 10px;">LEGO GUESS WHO</h1>
-
-        <div id="setup-view" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 30px;">
-            <div style="background: #2a2a2a; padding: 25px; border: 3px solid #0088ff; border-radius: 20px; width: 300px;">
-                <h3 style="color: #0088ff; margin-top: 0;">STWÓRZ GRĘ</h3>
-                <button onclick="createGame()" style="background: #0088ff; color: white; width: 100%; font-size: 18px; padding: 15px; border-radius: 10px; border: none;">GENERUJ KOD</button>
-            </div>
-            <div style="background: #2a2a2a; padding: 25px; border: 3px solid #ffcc00; border-radius: 20px; width: 300px;">
-                <h3 style="color: #ffcc00; margin-top: 0;">DOŁĄCZ DO GRY</h3>
-                <input type="text" id="room-input" placeholder="WPISZ KOD" style="padding: 12px; border-radius: 8px; width: 85%; text-align: center; font-size: 18px; margin-bottom: 15px; background: #eee; color: black;">
-                <button onclick="joinGame()" style="background: #ffcc00; color: black; width: 100%; font-size: 18px; padding: 15px; border-radius: 10px; border: none;">DOŁĄCZ</button>
-            </div>
-        </div>
-
-        <div id="lobby-view" style="display: none; margin-top: 20px;">
-            <div style="background: #333; padding: 20px; border-radius: 15px; border: 2px solid #00ff00; display: inline-block;">
-                <p style="margin: 0; color: #bbb;">KOD TWOJEGO POKOJU:</p>
-                <h2 id="display-code" style="margin: 10px 0; font-size: 40px; font-family: monospace; color: white;">---</h2>
-                <button onclick="copyRoomLink()" style="font-size: 12px; background: #555;">Skopiuj Link dla znajomego</button>
-            </div>
-            <h3 style="margin: 20px 0;">Wybierz kategorię:</h3>
-            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
-                <button class="cat-btn" onclick="initGame('LEGO STAR WARS')">Star Wars</button>
-                <button class="cat-btn" onclick="initGame('LEGO INIEMAMOCNI')">Iniemamocni</button>
-                <button class="cat-btn" onclick="initGame('LEGO BATMAN (1-3)')">Batman</button>
-                <button class="cat-btn" onclick="initGame('LEGO NINJAGO')">Ninjago</button>
-                <button class="cat-btn" onclick="initGame('MIX')" style="background: orange; color: black;">TRYB MIX</button>
-            </div>
+<div id="menu">
+    <h1 style="color: var(--lego-yellow); font-size: 40px; text-shadow: 2px 2px #000;">🧩 LEGO GUESS WHO</h1>
+    
+    <div id="setup-view">
+        <button class="btn" onclick="createGame()">STWÓRZ NOWY POKÓJ</button>
+        <div style="margin: 30px 0;">
+            <p>LUB DOŁĄCZ DO ZNAJOMEGO:</p>
+            <input type="text" id="room-input" placeholder="Wpisz kod pokoju...">
+            <button class="btn" style="background: var(--lego-blue); box-shadow: 0 4px #004a7c;" onclick="joinGame()">DOŁĄCZ</button>
         </div>
     </div>
 
-    <div id="game-area" style="display:none;">
-        <div style="background: #333; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #ffcc00; display: inline-block;">
-            <h2 style="margin: 0;">Twoja postać to: <span id="target-name" style="color: #ffcc00;">...</span></h2>
+    <div id="lobby-view" style="display: none; margin-top: 20px;">
+        <div style="background: #333; padding: 20px; border-radius: 15px; border: 2px solid #00ff00; display: inline-block;">
+            <p style="margin: 0; color: #bbb;">KOD TWOJEGO POKOJU:</p>
+            <h2 id="display-code" style="margin: 10px 0; font-size: 45px; font-family: monospace; color: white; letter-spacing: 3px;">---</h2>
+            <button onclick="copyRoomLink()" style="font-size: 12px; background: #555; color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer;">📋 Skopiuj Link</button>
         </div>
-        <div>
-            <button onclick="location.reload()">← WRÓĆ DO MENU</button>
-        </div>
-        <div id="character-grid"></div>
+
+        <h3 style="margin: 30px 0;">Wybierz kategorię gry:</h3>
+        <div id="category-buttons" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 900px; margin: 0 auto;"></div>
     </div>
+</div>
+
+<div id="game-area" style="display: none;">
+    <div class="target-box">
+        <p style="margin: 0; color: #aaa; font-weight: bold;">TWOJA POSTAĆ:</p>
+        <h2 id="target-name" style="margin: 5px 0; color: var(--lego-yellow); font-size: 28px;">---</h2>
+    </div>
+    
+    <div style="margin-bottom: 20px;">
+        <button onclick="backToMenu()" style="background: #e3000b; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">ZAKOŃCZ GRĘ</button>
+    </div>
+
+    <div id="character-grid" class="character-grid"></div>
+</div>
 
 <script>
     const githubConfig = {
@@ -87,104 +140,6 @@
         repo: "lego-guess-who",
         folder: "img"
     };
-
-    // --- FUNKCJE LOGICZNE ---
-
-    function createGame() {
-        const randomCode = "LEGO-" + Math.floor(100 + Math.random() * 899);
-        const input = document.getElementById('room-input');
-        if(input) input.value = randomCode;
-        enterLobby(randomCode);
-    }
-
-    function joinGame() {
-        const input = document.getElementById('room-input');
-        const code = input ? input.value.trim() : "";
-        if (code === "") return alert("Najpierw wpisz kod!");
-        enterLobby(code);
-    }
-
-    function enterLobby(code) {
-        document.getElementById('setup-view').style.display = 'none';
-        document.getElementById('lobby-view').style.display = 'block';
-        document.getElementById('display-code').innerText = code.toUpperCase();
-    }
-
-    function copyRoomLink() {
-        const code = document.getElementById('display-code').innerText;
-        const url = window.location.origin + window.location.pathname + "?room=" + encodeURIComponent(code);
-        navigator.clipboard.writeText(url).then(() => alert("Link skopiowany!"));
-    }
-
-    function initGame(category) {
-        const grid = document.getElementById('character-grid');
-        const targetNameDisplay = document.getElementById('target-name');
-        const roomCode = document.getElementById('display-code').innerText;
-        
-        let characterPool = [];
-        if (category === "MIX") {
-            Object.keys(db).forEach(k => { characterPool = characterPool.concat(db[k]); });
-        } else {
-            characterPool = db[category] || [];
-        }
-
-        if (characterPool.length === 0) return alert("Błąd: Brak postaci w tej kategorii!");
-
-        grid.innerHTML = '';
-        
-        let seed = 0;
-        for(let i=0; i<roomCode.length; i++) seed += roomCode.charCodeAt(i);
-        const seededRandom = () => {
-            seed = (seed * 9301 + 49297) % 233280;
-            return seed / 233280;
-        };
-
-        let shuffled = [...characterPool].sort(() => seededRandom() - 0.5);
-        const selectedCharacters = shuffled.slice(0, 24);
-
-        const targetIndex = Math.floor(seededRandom() * selectedCharacters.length);
-        targetNameDisplay.innerText = selectedCharacters[targetIndex].n;
-
-        selectedCharacters.forEach(char => {
-            const fileName = encodeURIComponent(char.n) + ".jpg";
-            const urlGithub = `https://raw.githubusercontent.com/${githubConfig.user}/${githubConfig.repo}/main/${githubConfig.folder}/${fileName}`;
-            const cleanName = char.n.replace(/\(.*\)/, '').trim();
-            const urlInternet = `https://tse2.mm.bing.net/th?q=lego+${encodeURIComponent(cleanName)}+minifigure&w=200&h=300&c=7&rs=1&p=0&dpr=1&pid=1.7`;
-
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <div style="position: relative; height: 140px; background: #eee; border-radius: 5px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                    <img class="main-img" src="${urlGithub}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                    <button class="dl-btn" style="display:none; position: absolute; bottom: 0; width: 100%; background: #28a745; color: white; border: none; font-size: 10px; padding: 5px; cursor: pointer;">📥 ZAPISZ DO IMG</button>
-                </div>
-                <p style="margin-top: 8px; font-weight: bold; font-size: 12px; color: black;">${char.n}</p>
-            `;
-
-            const imgTag = card.querySelector('.main-img');
-            const dlBtn = card.querySelector('.dl-btn');
-
-            imgTag.onerror = function() {
-                if (imgTag.src !== urlInternet) {
-                    imgTag.src = urlInternet;
-                    dlBtn.style.display = "block";
-                }
-            };
-
-            dlBtn.onclick = (e) => {
-                e.stopPropagation();
-                const a = document.createElement('a');
-                a.href = urlInternet; a.download = char.n + ".jpg";
-                a.click();
-            };
-
-            card.onclick = () => card.classList.toggle('hidden');
-            grid.appendChild(card);
-        });
-
-        document.getElementById('menu').style.display = 'none';
-        document.getElementById('game-area').style.display = 'block';
-    }
 
     // --- BAZA DANYCH POSTACI ---
 
@@ -338,109 +293,84 @@
             {n:"Chudy (Toy Story)"}, {n:"Zygzak McQueen (Auta)"}, {n:"Merida Waleczna"}, {n:"Miguel (Coco)"}, {n:"Sulley (Potwory i Spółka)"}
         ]
     };
-// --- FUNKCJE LOGICZNE ---
 
-    function createGame() {
-        const randomCode = "LEGO-" + Math.floor(100 + Math.random() * 899);
-        const input = document.getElementById('room-input');
-        if(input) input.value = randomCode;
-        enterLobby(randomCode);
+function createGame() {
+        const code = "LEGO-" + Math.floor(100 + Math.random() * 899);
+        document.getElementById('room-input').value = code;
+        enterLobby(code);
     }
 
     function joinGame() {
-        const input = document.getElementById('room-input');
-        const code = input ? input.value.trim() : "";
-        if (code.length < 1) {
-            alert("Najpierw wpisz kod od znajomego!");
-            return;
-        }
+        const code = document.getElementById('room-input').value.trim();
+        if (code.length < 1) return alert("Wpisz kod!");
         enterLobby(code);
     }
 
     function enterLobby(code) {
-        const setupView = document.getElementById('setup-view');
-        const lobbyView = document.getElementById('lobby-view');
-        const displayCode = document.getElementById('display-code');
-        
-        if(setupView) setupView.style.display = 'none';
-        if(lobbyView) lobbyView.style.display = 'block';
-        if(displayCode) displayCode.innerText = code.toUpperCase();
-        
-        generateCategoryButtons(); // Generujemy przyciski po wejściu do lobby
+        document.getElementById('setup-view').style.display = 'none';
+        document.getElementById('lobby-view').style.display = 'block';
+        document.getElementById('display-code').innerText = code.toUpperCase();
+        generateCategoryButtons();
     }
 
     function copyRoomLink() {
-        const displayCode = document.getElementById('display-code');
-        const code = displayCode ? displayCode.innerText : "";
-        const url = window.location.origin + window.location.pathname + "?room=" + encodeURIComponent(code);
-        
-        navigator.clipboard.writeText(url).then(() => {
-            alert("Link skopiowany! Wyślij go znajomemu.");
-        });
+        const code = document.getElementById('display-code').innerText;
+        const url = window.location.origin + window.location.pathname + "?room=" + code;
+        navigator.clipboard.writeText(url).then(() => alert("Link skopiowany!"));
     }
 
-    // Dynamiczne tworzenie przycisków na podstawie kluczy w db
     function generateCategoryButtons() {
         const container = document.getElementById('category-buttons');
-        if (!container) return;
-        container.innerHTML = ''; // Czyścimy stare przyciski
-
+        container.innerHTML = '';
+        
         // Przycisk MIX
         const mixBtn = document.createElement('button');
         mixBtn.className = 'cat-btn';
-        mixBtn.style.background = '#ff8800';
+        mixBtn.style.background = 'orange';
         mixBtn.style.color = 'black';
-        mixBtn.innerText = 'TRYB MIX (WSZYSTKO)';
+        mixBtn.innerText = '🔥 TRYB MIX';
         mixBtn.onclick = () => initGame('MIX');
         container.appendChild(mixBtn);
 
-        // Przyciski z Twojej bazy db
-        Object.keys(db).forEach(category => {
+        // Reszta kategorii
+        Object.keys(db).forEach(cat => {
             const btn = document.createElement('button');
             btn.className = 'cat-btn';
-            btn.innerText = category.replace('LEGO ', ''); // Upiększamy nazwę
-            btn.onclick = () => initGame(category);
+            btn.innerText = cat.replace('LEGO ', '');
+            btn.onclick = () => initGame(cat);
             container.appendChild(btn);
         });
     }
 
     function initGame(category) {
-        const menu = document.getElementById('menu');
-        const gameArea = document.getElementById('game-area');
-        const targetNameDisplay = document.getElementById('target-name');
-        const grid = document.getElementById('character-grid');
-        const displayCode = document.getElementById('display-code');
-        
-        const roomCode = (displayCode && displayCode.innerText !== "---") ? displayCode.innerText : "SOLO";
-        
-        let characterPool = [];
-        if (category === "MIX") {
-            Object.keys(db).forEach(key => { characterPool = characterPool.concat(db[key]); });
-        } else if (db[category]) {
-            characterPool = [...db[category]];
+        const roomCode = document.getElementById('display-code').innerText;
+        let pool = [];
+        if (category === 'MIX') {
+            Object.values(db).forEach(list => pool = pool.concat(list));
+        } else {
+            pool = [...db[category]];
         }
 
-        if (characterPool.length === 0) return alert("Błąd bazy danych!");
-
-        // SEEDOWANIE (ten sam zestaw dla tego samego kodu pokoju)
-        let seed = 0;
-        for(let i=0; i<roomCode.length; i++) seed += roomCode.charCodeAt(i);
+        // --- SEEDOWANIE PLANSZY (Synchronizacja układu) ---
+        let boardSeed = 0;
+        for(let i=0; i<roomCode.length; i++) boardSeed += roomCode.charCodeAt(i);
         const seededRandom = () => {
-            seed = (seed * 9301 + 49297) % 233280;
-            return seed / 233280;
+            boardSeed = (boardSeed * 9301 + 49297) % 233280;
+            return boardSeed / 233280;
         };
 
-        // Losowanie 24 postaci
-        let shuffled = [...characterPool].sort(() => seededRandom() - 0.5);
-        const selectedCharacters = shuffled.slice(0, 24);
+        // Mieszamy karty seedem (każdy ma te same 24 karty)
+        let shuffled = pool.sort(() => seededRandom() - 0.5);
+        const selected = shuffled.slice(0, 24);
 
-        // Wybór Twojej postaci (target)
-        const targetIndex = Math.floor(seededRandom() * selectedCharacters.length);
-        targetNameDisplay.innerText = selectedCharacters[targetIndex].n;
+        // --- LOSOWANIE TWOJEJ POSTACI (Różna dla każdego gracza) ---
+        const target = selected[Math.floor(Math.random() * 24)];
+        document.getElementById('target-name').innerText = target.n;
 
-        grid.innerHTML = ''; 
+        const grid = document.getElementById('character-grid');
+        grid.innerHTML = '';
 
-        selectedCharacters.forEach(char => {
+        selected.forEach(char => {
             const card = document.createElement('div');
             card.className = 'card';
             
@@ -450,47 +380,35 @@
             const urlInternet = `https://tse2.mm.bing.net/th?q=lego+${encodeURIComponent(cleanName)}+minifigure&w=200&h=300&c=7&rs=1&p=0&dpr=1&pid=1.7`;
 
             card.innerHTML = `
-                <div class="card-img-wrapper" style="position: relative; height: 140px; background: #f0f0f0; border-radius: 5px; overflow: hidden; display:flex; align-items:center; justify-content:center;">
+                <div style="height: 140px; display: flex; align-items: center; justify-content: center; background: #f9f9f9; border-radius: 5px; overflow: hidden;">
                     <img class="main-img" src="${urlGithub}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                    <button class="dl-btn" style="display:none; position: absolute; bottom: 0; width: 100%; background: #28a745; color: white; border: none; font-size: 10px; padding: 5px; cursor: pointer;">📥 ZAPISZ</button>
                 </div>
-                <p style="margin-top: 8px; font-weight: bold; font-size: 11px; color: black;">${char.n}</p>
+                <p style="color:black; font-size:11px; font-weight:bold; margin:8px 0 0 0; min-height: 25px;">${char.n}</p>
             `;
 
             const imgTag = card.querySelector('.main-img');
-            const dlBtn = card.querySelector('.dl-btn');
-
             imgTag.onerror = function() {
-                if (imgTag.src !== urlInternet) {
-                    imgTag.src = urlInternet;
-                    dlBtn.style.display = "block";
-                }
-            };
-
-            dlBtn.onclick = (e) => {
-                e.stopPropagation();
-                const a = document.createElement('a');
-                a.href = urlInternet; a.download = char.n + ".jpg";
-                a.click();
+                if (this.src !== urlInternet) this.src = urlInternet;
             };
             
             card.onclick = () => card.classList.toggle('hidden');
             grid.appendChild(card);
         });
 
-        menu.style.display = 'none';
-        gameArea.style.display = 'block';
+        document.getElementById('menu').style.display = 'none';
+        document.getElementById('game-area').style.display = 'block';
     }
+
+    function backToMenu() { location.reload(); }
 
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
-        const roomFromUrl = urlParams.get('room');
-        if (roomFromUrl) {
-            const input = document.getElementById('room-input');
-            if(input) input.value = roomFromUrl;
-            enterLobby(roomFromUrl);
+        const room = urlParams.get('room');
+        if (room) {
+            document.getElementById('room-input').value = room;
+            enterLobby(room);
         }
     }
 </script>
 </body>
-</html>
+</html>   
