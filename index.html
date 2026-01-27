@@ -591,21 +591,16 @@ db["LEGO STAR WARS"] = [
     {n:"Zygzak McQueen (Auta)"}, 
     {n:"Merida Waleczna"}, 
     {n:"Miguel (Coco)"}, 
-    {n:"Sulley (Potwory i Spółka)"}
-];
-    
-    // --- KONIEC BAZY DANYCH ---
+   {n:"Sulley (Potwory i Spółka)"}
+  ]
+}; // To zamyka bazę db - upewnij się, że jest TYLKO JEDNA taka linijka tutaj
 
-    
-    };
-
-    // 1. FUNKCJE OBSŁUGI POKOJU
-    function createGame() {
-        const randomCode = "LEGO-" + Math.floor(100 + Math.random() * 899);
-        const input = document.getElementById('room-input');
-        if(input) input.value = randomCode;
-        enterLobby(randomCode);
-    }
+function createGame() {
+    const randomCode = "LEGO-" + Math.floor(100 + Math.random() * 899);
+    const input = document.getElementById('room-input');
+    if(input) input.value = randomCode;
+    enterLobby(randomCode);
+}
 
     function joinGame() {
         const input = document.getElementById('room-input');
