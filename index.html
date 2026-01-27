@@ -342,26 +342,43 @@ function createGame() {
         });
     }
 
+    // --- KLUCZOWA FUNKCJA: INICJALIZACJA GRY ---
     function initGame(category) {
         const roomCode = document.getElementById('display-code').innerText;
         let pool = (category === 'MIX') ? [].concat(...Object.values(db)) : [...db[category]];
 
-        // SEED PLANSZY
-        let boardSeed = 0;
-        for(let i=0; i<roomCode.length; i++) boardSeed += roomCode.charCodeAt(i);
-        const seededRandom = () => {
-            boardSeed = (boardSeed * 9301 + 49297) % 233280;
-            return boardSeed / 233280;
-        };
+        // 1. ZAMIANA KODU POKOJU NA LICZBĘ (SEED)
+        let seed = 0;
+        for (let i = 0; i < roomCode.length; i++) {
+            seed = ((seed << 5) - seed) + roomCode.charCodeAt(i);
+            seed |= 0;
+        }
 
-        // Mieszanie planszy (tak samo dla obu graczy)
-        let shuffled = pool.sort(() => seededRandom() - 0.5);
-        const selected = shuffled.slice(0, 24);
+        // 2. GENERATOR LICZB PSEUDOLOSOWYCH (Mulberry32)
+        function mulberry32(a) {
+            return function() {
+              var t = a += 0x6D2B79F5;
+              t = Math.imul(t ^ t >>> 15, t | 1);
+              t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+              return ((t ^ t >>> 14) >>> 0) / 4294967296;
+            }
+        }
+        const rand = mulberry32(seed);
 
-        // Losowanie twojej postaci (inaczej dla każdego)
+        // 3. MIESZANIE FISHER-YATES (Gwarantuje ten sam wynik u obu graczy)
+        for (let i = pool.length - 1; i > 0; i--) {
+            const j = Math.floor(rand() * (i + 1));
+            [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+
+        // 4. WYBÓR TYCH SAMYCH 24 KART
+        const selected = pool.slice(0, 24);
+
+        // 5. TWOJA POSTAĆ (Całkowicie losowa dla każdego gracza z puli tych 24 kart)
         const target = selected[Math.floor(Math.random() * 24)];
         document.getElementById('target-name').innerText = target.n;
 
+        // 6. RENDEROWANIE PLANSZY
         const grid = document.getElementById('character-grid');
         grid.innerHTML = '';
 
