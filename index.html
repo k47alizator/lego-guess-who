@@ -379,61 +379,65 @@ function createGame() {
         document.getElementById('target-name').innerText = target.n;
 
         
-        // 6. RENDEROWANIE PLANSZY
-        const grid = document.getElementById('character-grid');
-        grid.innerHTML = '';
+       // 6. RENDEROWANIE PLANSZY
+        const grid = document.getElementById('character-grid');
+        grid.innerHTML = '';
 
-        selected.forEach(char => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            
-            // Lista formatów do przetestowania
+        selected.forEach(char => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            
             const extensions = ['jpg', 'png', 'webp', 'jpeg'];
             let currentExtIndex = 0;
 
-            // Funkcja pomocnicza do budowania adresu GitHub
             const getGithubUrl = (ext) => `https://raw.githubusercontent.com/${githubConfig.user}/${githubConfig.repo}/main/${githubConfig.folder}/${encodeURIComponent(char.n)}.${ext}`;
             
-            const cleanName = char.n.replace(/\(.*\)/, '').trim();
-            const urlInternet = `https://tse2.mm.bing.net/th?q=lego+${encodeURIComponent(cleanName)}+minifigure&w=200&h=300&c=7&rs=1&p=0&dpr=1&pid=1.7`;
+            const cleanName = char.n.replace(/\(.*\)/, '').trim();
+            const urlInternet = `https://tse2.mm.bing.net/th?q=lego+${encodeURIComponent(cleanName)}+minifigure&w=200&h=300&c=7&rs=1&p=0&dpr=1&pid=1.7`;
 
-            card.innerHTML = `
-                <div style="position: relative; height: 140px; background: #f0f0f0; border-radius: 5px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                    <img class="main-img" src="${getGithubUrl(extensions[0])}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                    <button class="dl-btn" style="display:none; position:absolute; bottom:5px; background:rgba(255,255,255,0.8); border:none; padding:2px 5px; font-size:10px; cursor:pointer;">🌐 BING</button>
-                </div>
-                <p style="color:black; font-size:11px; font-weight:bold; margin-top:8px;">${char.n}</p>
-            `;
+            card.innerHTML = `
+                <div style="position: relative; height: 140px; background: #e0e0e0; border-radius: 5px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                    <img class="main-img" src="${getGithubUrl(extensions[0])}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                    <button class="bing-badge" style="display:none;">🌐 INTERNET</button>
+                </div>
+                <p style="color:black; font-size:11px; font-weight:bold; margin-top:8px; pointer-events:none;">${char.n}</p>
+            `;
 
-            const imgTag = card.querySelector('.main-img');
-            const dlBtn = card.querySelector('.dl-btn');
+            const imgTag = card.querySelector('.main-img');
+            const bingBtn = card.querySelector('.bing-badge');
 
-            // --- LOGIKA NAPRAWCZA OBRAZKÓW ---
-            imgTag.onerror = function() {
-                // Jeśli są jeszcze inne formaty do sprawdzenia na GitHubie:
+            // --- LOGIKA FORMATÓW I OZNACZANIA ŹRÓDŁA ---
+            imgTag.onerror = function() {
                 if (currentExtIndex < extensions.length - 1) {
                     currentExtIndex++;
                     this.src = getGithubUrl(extensions[currentExtIndex]);
                 } 
-                // Jeśli nic na GitHubie nie działa, weź z Binga:
                 else if (this.src !== urlInternet) {
                     this.src = urlInternet;
-                    dlBtn.style.display = "block";
+                    bingBtn.style.display = "block";
+                    card.classList.add('is-internet'); // Dodaje niebieskie oznaczenie
                 }
-            };
+            };
 
-            dlBtn.onclick = (e) => {
-                e.stopPropagation();
-                window.open(urlInternet, '_blank');
-            };
-            
-            // ZMIANA: toggle klasy 'eliminated' zamiast 'hidden'
-            card.onclick = () => card.classList.toggle('eliminated');
-            grid.appendChild(card);
-        });
+            // Kliknięcie w przycisk "INTERNET" otwiera oryginał
+            bingBtn.onclick = (e) => {
+                e.stopPropagation(); // Ważne: nie zaznacza karty przy kliknięciu w guzik
+                window.open(urlInternet, '_blank');
+            };
+            
+            // KLIKNIĘCIE W KARTĘ (Zaznacz / Odznacz)
+            card.onclick = function(e) {
+                // Zapobiegamy błędom jeśli kliknięto w przycisk
+                if (e.target.tagName === 'BUTTON') return;
+                
+                this.classList.toggle('eliminated');
+            };
 
-        document.getElementById('menu').style.display = 'none';
-        document.getElementById('game-area').style.display = 'block';
+            grid.appendChild(card);
+        });
+
+        document.getElementById('menu').style.display = 'none';
+        document.getElementById('game-area').style.display = 'block';
     }
 
     // Ulepszona funkcja kopiowania linku (zapobiega błędom z podwójnym '?')
