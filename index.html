@@ -306,8 +306,18 @@
             {n:"Chudy (Toy Story)"}, {n:"Zygzak McQueen (Auta)"}, {n:"Merida Waleczna"}, {n:"Miguel (Coco)"}, {n:"Sulley (Potwory i Spółka)"}
         ]
     };
+// --- FUNKCJE POMOCNICZE ---
 
-function createGame() {
+    // Automat zamieniający nazwę kategorii na nazwę folderu na GitHub (np. "LEGO STAR WARS" -> "star-wars")
+    const getFolderName = (catName) => {
+        return catName.replace('LEGO ', '')
+                      .toLowerCase()
+                      .trim()
+                      .replace(/\s+\/\s+/g, '-') // Zamienia " / " na "-"
+                      .replace(/\s+/g, '-');     // Zamienia spacje na "-"
+    };
+
+    function createGame() {
         const code = "LEGO-" + Math.floor(100 + Math.random() * 899);
         document.getElementById('room-input').value = code;
         enterLobby(code);
@@ -330,13 +340,16 @@ function createGame() {
         const container = document.getElementById('category-buttons');
         container.innerHTML = '';
         
+        // Przycisk TRYB MIX
         const mixBtn = document.createElement('button');
         mixBtn.className = 'cat-btn';
-        mixBtn.style.background = 'orange'; mixBtn.style.color = 'black';
+        mixBtn.style.background = 'orange'; 
+        mixBtn.style.color = 'black';
         mixBtn.innerText = '🔥 TRYB MIX';
         mixBtn.onclick = () => initGame('MIX');
         container.appendChild(mixBtn);
 
+        // Przyciski kategorii z bazy danych
         Object.keys(db).forEach(cat => {
             const btn = document.createElement('button');
             btn.className = 'cat-btn';
@@ -346,44 +359,58 @@ function createGame() {
         });
     }
 
-    // --- KLUCZOWA FUNKCJA: INICJALIZACJA GRY ---
+    // --- GŁÓWNA LOGIKA GRY ---
+
     function initGame(category) {
         const roomCode = document.getElementById('display-code').innerText;
-        let pool = (category === 'MIX') ? [].concat(...Object.values(db)) : [...db[category]];
+        let pool = [];
 
-        // 1. ZAMIANA KODU POKOJU NA LICZBĘ (SEED)
+        // PRZYPISANIE FOLDERÓW: Każda postać dostaje info o swoim podfolderze
+        if (category === 'MIX') {
+            Object.keys(db).forEach(cat => {
+                const folder = getFolderName(cat);
+                db[cat].forEach(char => {
+                    pool.push({ ...char, folder: folder });
+                });
+            });
+        } else {
+            const folder = getFolderName(category);
+            pool = db[category].map(char => ({ ...char, folder: folder }));
+        }
+
+        if (pool.length < 1) return alert("Ta kategoria jest pusta!");
+
+        // 1. SEEDOWANIE (ten sam układ u obu graczy na podstawie kodu pokoju)
         let seed = 0;
         for (let i = 0; i < roomCode.length; i++) {
             seed = ((seed << 5) - seed) + roomCode.charCodeAt(i);
             seed |= 0;
         }
 
-        // 2. GENERATOR LICZB PSEUDOLOSOWYCH (Mulberry32)
         function mulberry32(a) {
             return function() {
-              var t = a += 0x6D2B79F5;
-              t = Math.imul(t ^ t >>> 15, t | 1);
-              t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-              return ((t ^ t >>> 14) >>> 0) / 4294967296;
+                var t = a += 0x6D2B79F5;
+                t = Math.imul(t ^ t >>> 15, t | 1);
+                t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+                return ((t ^ t >>> 14) >>> 0) / 4294967296;
             }
         }
         const rand = mulberry32(seed);
 
-        // 3. MIESZANIE FISHER-YATES (Gwarantuje ten sam wynik u obu graczy)
+        // 2. MIESZANIE FISHER-YATES
         for (let i = pool.length - 1; i > 0; i--) {
             const j = Math.floor(rand() * (i + 1));
             [pool[i], pool[j]] = [pool[j], pool[i]];
         }
 
-        // 4. WYBÓR TYCH SAMYCH 24 KART
+        // 3. WYBÓR 24 KART
         const selected = pool.slice(0, 24);
 
-        // 5. TWOJA POSTAĆ (Całkowicie losowa dla każdego gracza z puli tych 24 kart)
-        const target = selected[Math.floor(Math.random() * 24)];
+        // 4. LOSOWANIE TWOJEJ POSTACI (unikalna dla każdego gracza)
+        const target = selected[Math.floor(Math.random() * selected.length)];
         document.getElementById('target-name').innerText = target.n;
 
-        
-       // 6. RENDEROWANIE PLANSZY
+        // 5. RENDEROWANIE PLANSZY
         const grid = document.getElementById('character-grid');
         grid.innerHTML = '';
 
@@ -394,10 +421,11 @@ function createGame() {
             const extensions = ['jpg', 'png', 'webp', 'jpeg'];
             let currentExtIndex = 0;
 
-            const getGithubUrl = (ext) => `https://raw.githubusercontent.com/${githubConfig.user}/${githubConfig.repo}/main/${githubConfig.folder}/${encodeURIComponent(char.n)}.${ext}`;
+            // DYNAMICZNY ADRES: uwzględnia podfolder przypisany do postaci
+            const getGithubUrl = (ext) => `https://raw.githubusercontent.com/${githubConfig.user}/${githubConfig.repo}/main/${githubConfig.folder}/${char.folder}/${encodeURIComponent(char.n)}.${ext}`;
             
             const cleanName = char.n.replace(/\(.*\)/, '').trim();
-            const urlInternet = `https://tse2.mm.bing.net/th?q=lego+${encodeURIComponent(cleanName)}+minifigure&w=200&h=300&c=7&rs=1&p=0&dpr=1&pid=1.7`;
+            const urlInternet = `https://tse2.mm.bing.net/th?q=lego+${encodeURIComponent(cleanName)}+minifigure&w=200&h=300&c=7`;
 
             card.innerHTML = `
                 <div style="position: relative; height: 140px; background: #e0e0e0; border-radius: 5px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
@@ -410,30 +438,20 @@ function createGame() {
             const imgTag = card.querySelector('.main-img');
             const bingBtn = card.querySelector('.bing-badge');
 
-            // --- LOGIKA FORMATÓW I OZNACZANIA ŹRÓDŁA ---
+            // Logika sprawdzania formatów i przełączania na Bing
             imgTag.onerror = function() {
                 if (currentExtIndex < extensions.length - 1) {
                     currentExtIndex++;
                     this.src = getGithubUrl(extensions[currentExtIndex]);
-                } 
-                else if (this.src !== urlInternet) {
+                } else if (this.src !== urlInternet) {
                     this.src = urlInternet;
                     bingBtn.style.display = "block";
-                    card.classList.add('is-internet'); // Dodaje niebieskie oznaczenie
+                    card.classList.add('is-internet');
                 }
             };
 
-            // Kliknięcie w przycisk "INTERNET" otwiera oryginał
-            bingBtn.onclick = (e) => {
-                e.stopPropagation(); // Ważne: nie zaznacza karty przy kliknięciu w guzik
-                window.open(urlInternet, '_blank');
-            };
-            
-            // KLIKNIĘCIE W KARTĘ (Zaznacz / Odznacz)
             card.onclick = function(e) {
-                // Zapobiegamy błędom jeśli kliknięto w przycisk
                 if (e.target.tagName === 'BUTTON') return;
-                
                 this.classList.toggle('eliminated');
             };
 
@@ -442,25 +460,23 @@ function createGame() {
 
         document.getElementById('menu').style.display = 'none';
         document.getElementById('game-area').style.display = 'block';
-    }
+    }
 
-    // Ulepszona funkcja kopiowania linku (zapobiega błędom z podwójnym '?')
-    function copyRoomLink() {
-        const code = document.getElementById('display-code').innerText;
+    function copyRoomLink() {
+        const code = document.getElementById('display-code').innerText;
         const url = new URL(window.location.origin + window.location.pathname);
         url.searchParams.set('room', code);
-        navigator.clipboard.writeText(url.toString()).then(() => alert("Skopiowano link do pokoju!"));
-    }
+        navigator.clipboard.writeText(url.toString()).then(() => alert("Skopiowano link do pokoju!"));
+    }
 
-    window.onload = function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const room = urlParams.get('room');
-        // Automatyczne wchodzenie do lobby jeśli link zawiera kod
-        if (room) { 
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const room = urlParams.get('room');
+        if (room) { 
             document.getElementById('room-input').value = room.toUpperCase(); 
             enterLobby(room); 
         }
-    }
+    }
 </script>
 </body>
 </html>
