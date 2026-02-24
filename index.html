@@ -30,6 +30,7 @@
             margin: 20px auto;
         }
 
+        /* --- STYL KARTY (Z POPRAWKĄ ODZNACZANIA) --- */
         .card {
             background: white;
             border-radius: 10px;
@@ -37,15 +38,33 @@
             cursor: pointer;
             transition: transform 0.2s, opacity 0.3s;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            position: relative; /* Ważne dla pozycjonowania plakietki */
         }
 
         .card:hover { transform: scale(1.03); }
 
-        .card.hidden {
-            opacity: 0.1;
-            filter: grayscale(1);
-            transform: scale(0.9);
-            pointer-events: none;
+        /* Stan wyeliminowany: Usunięto pointer-events:none, żeby dało się odklikać */
+        .card.eliminated {
+            opacity: 0.15;
+            filter: grayscale(100%) brightness(0.7);
+            transform: scale(0.95);
+        }
+
+        /* --- SUBTELNA PLAKIETKA INTERNET --- */
+        .bing-badge {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            background: rgba(0, 108, 183, 0.8); /* Półprzezroczysty błękit LEGO */
+            color: white;
+            border: none;
+            padding: 1px 4px;
+            font-size: 7px; /* Bardzo mała i subtelna */
+            font-weight: bold;
+            border-radius: 2px;
+            z-index: 10;
+            pointer-events: none; /* Klikasz w kartę, nie w napis */
+            text-transform: uppercase;
         }
 
         .btn {
@@ -90,20 +109,6 @@
             border: 3px solid var(--lego-yellow);
             display: inline-block;
             margin-bottom: 20px;
-        }
-
-        .dl-btn {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            background: rgba(40, 167, 69, 0.95);
-            color: white;
-            border: none;
-            font-size: 9px;
-            padding: 6px 2px;
-            cursor: pointer;
-            font-weight: bold;
-            z-index: 20;
         }
     </style>
 </head>
@@ -151,8 +156,7 @@
     };
 
     // --- BAZA DANYCH POSTACI ---
-
-   const db = {
+    const db = {
         "LEGO STAR WARS": [
             {n:"Luke Skywalker (z Tatooine)"}, {n:"Luke Skywalker (Pilot X-Wing)"}, {n:"Luke Skywalker (z Bespin)"}, {n:"Luke Skywalker (z Dagobah)"}, {n:"Luke Skywalker (Rycerz Jedi)"}, {n:"Luke Skywalker (z Endor)"}, {n:"Luke Skywalker (Szturmowiec)"}, {n:"Luke Skywalker (z Hoth)"}, {n:"Luke Skywalker (Ceremonia)"}, {n:"Luke Skywalker (Stary Luke)"}, {n:"Luke Skywalker (z Crait)"}, {n:"Luke Skywalker (Duch Mocy)"}, {n:"Luke Skywalker (Zbiornik Bacta)"}, {n:"Luke Skywalker (Pilot Śmigacza)"},
             {n:"Darth Vader"}, {n:"Darth Vader (Bez Maski)"}, {n:"Darth Vader (Zniszczony)"}, {n:"Darth Vader (Świąteczny)"}, {n:"Anakin Skywalker (Dziecko)"}, {n:"Anakin Skywalker (Padawan)"}, {n:"Anakin Skywalker (Rycerz Jedi)"}, {n:"Anakin Skywalker (Sith)"}, {n:"Anakin Skywalker (Duch Mocy)"}, {n:"Anakin Skywalker (Pilot Podracera)"}, {n:"Anakin Skywalker (W kurtce)"},
