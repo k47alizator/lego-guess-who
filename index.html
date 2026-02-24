@@ -30,7 +30,6 @@
             margin: 20px auto;
         }
 
-        /* --- STYL KARTY (Z POPRAWKĄ ODZNACZANIA) --- */
         .card {
             background: white;
             border-radius: 10px;
@@ -38,32 +37,30 @@
             cursor: pointer;
             transition: transform 0.2s, opacity 0.3s;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            position: relative; /* Ważne dla pozycjonowania plakietki */
+            position: relative;
         }
 
         .card:hover { transform: scale(1.03); }
 
-        /* Stan wyeliminowany: Usunięto pointer-events:none, żeby dało się odklikać */
         .card.eliminated {
             opacity: 0.15;
             filter: grayscale(100%) brightness(0.7);
             transform: scale(0.95);
         }
 
-        /* --- SUBTELNA PLAKIETKA INTERNET --- */
         .bing-badge {
             position: absolute;
             top: 3px;
             right: 3px;
-            background: rgba(0, 108, 183, 0.8); /* Półprzezroczysty błękit LEGO */
+            background: rgba(0, 108, 183, 0.8);
             color: white;
             border: none;
             padding: 1px 4px;
-            font-size: 7px; /* Bardzo mała i subtelna */
+            font-size: 7px;
             font-weight: bold;
             border-radius: 2px;
             z-index: 10;
-            pointer-events: none; /* Klikasz w kartę, nie w napis */
+            pointer-events: none;
             text-transform: uppercase;
         }
 
@@ -89,7 +86,10 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 13px;
+            transition: background 0.2s;
         }
+
+        .cat-btn:hover { background: #0085e4; }
 
         input {
             padding: 10px;
