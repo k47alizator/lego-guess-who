@@ -26,11 +26,14 @@
             margin: 0;
             text-align: center;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         #menu, #game-area { 
             padding: 40px 20px; 
             position: relative; 
+            flex: 1;
         }
 
         h1.main-title {
@@ -335,12 +338,30 @@
         }
 
         .discord-corner img { width: 60%; height: 60%; object-fit: contain; pointer-events: none; }
+
+        /* NOWY STYL: Dyskretna stopka */
+        .lego-footer {
+            width: 100%;
+            padding: 15px 10px;
+            font-size: 10px;
+            color: rgba(156, 163, 175, 0.4);
+            text-align: center;
+            background: rgba(15, 23, 42, 0.5);
+            box-sizing: border-box;
+        }
+
+        .lego-footer p {
+            margin: 3px 0;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
 
 <div id="menu">
-<div class="discord-corner" onclick="window.open('https://discord.gg/FeBT9tVEsY', '_blank')" title="Dołącz do Discorda">
+    <div class="discord-corner" onclick="window.open('https://discord.gg/FeBT9tVEsY', '_blank')" title="Dołącz do Discorda">
         <img src="img/Discord.png" alt="Discord">
     </div>
 
@@ -397,6 +418,10 @@
     </div>
     
     <div id="character-grid" class="character-grid"></div>
+</div>
+
+<div class="lego-footer">
+    <p>Niniejsza strona jest projektem fanowskim o charakterze niekomercyjnym. Gra nie jest w żaden sposób powiązana, wspierana ani sponsorowana przez Grupę LEGO. Wszelkie znaki towarowe, nazwy oraz wizerunki postaci należą do ich prawowitych właścicieli.</p>
 </div>
 
 <script>
@@ -597,7 +622,6 @@ const getFolderName = (catName) => {
         generateCategoryButtons();
     }
 
-    // NOWOŚĆ: Funkcja powrotu z samej planszy do wyboru kategorii
     function backToLobby() {
         document.getElementById('game-area').style.display = 'none';
         document.getElementById('menu').style.display = 'block';
