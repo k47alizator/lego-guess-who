@@ -18,7 +18,6 @@
 
         body {
             font-family: 'Fredoka', sans-serif;
-            /* Tło z folderu img w Twoim repozytorium */
             background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('img/tlo.jpg');
             background-size: cover;
             background-position: center;
@@ -31,7 +30,6 @@
 
         #menu, #game-area { padding: 40px 20px; }
 
-        /* --- NAGŁÓWEK --- */
         h1.main-title {
             font-weight: 700;
             font-size: clamp(2.5rem, 8vw, 4rem);
@@ -42,10 +40,7 @@
             margin-bottom: 5px;
         }
 
-        h1.main-title span { 
-            color: var(--lego-red); 
-            text-shadow: 3px 3px 0px #900; 
-        }
+        h1.main-title span { color: var(--lego-red); text-shadow: 3px 3px 0px #900; }
 
         .subtitle {
             font-size: 1rem;
@@ -55,7 +50,6 @@
             letter-spacing: 2px;
         }
 
-        /* --- KAFELKI MENU (Styl Brickle) --- */
         .start-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -115,9 +109,6 @@
             margin-top: 20px;
         }
 
-        input:focus { outline: none; border-color: var(--lego-yellow); }
-
-        /* --- LOBBY I PRZYCISKI --- */
         .cat-btn {
             background: rgba(255,255,255,0.05);
             color: white;
@@ -132,7 +123,6 @@
 
         .cat-btn:hover { background: var(--lego-blue); border-color: transparent; transform: scale(1.05); }
 
-        /* --- PLANSZA GRY --- */
         .character-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -221,12 +211,14 @@
                 <div class="card-desc">Załóż nowy pokój i zaproś znajomego.</div>
             </div>
 
-            <div class="brickle-card" id="join-card">
+            <div class="brickle-card" onclick="joinGame()">
                 <div class="icon-box icon-red"><i class="fa-solid fa-right-to-bracket"></i></div>
                 <div class="card-title">Dołącz</div>
                 <div class="card-desc">Wpisz kod i wejdź do wspólnej zabawy.</div>
-                <input type="text" id="room-input" placeholder="np. LEGO-123" onclick="event.stopPropagation()">
-                <button class="cat-btn" style="margin-top: 15px; width: 85%;" onclick="joinGame()">WEJDŹ</button>
+                <input type="text" id="room-input" placeholder="np. LEGO-123" 
+                       onclick="event.stopPropagation()" 
+                       onkeypress="if(event.key === 'Enter') joinGame()">
+                <button class="cat-btn" style="margin-top: 15px; width: 85%;">WEJDŹ</button>
             </div>
         </div>
     </div>
@@ -254,7 +246,6 @@
 </div>
 
 <script>
-    // --- KONFIGURACJA GITHUB ---
     const githubConfig = {
         user: "k47alizator",
         repo: "lego-guess-who",
@@ -413,11 +404,10 @@
         ]
     };
 const db = {
-        "LEGO STAR WARS": [{n: "Darth Vader"}, {n: "Luke Skywalker"}], // Przykładowe dane
+        "LEGO STAR WARS": [{n: "Darth Vader"}, {n: "Luke Skywalker"}],
         "LEGO NINJAGO": [{n: "Kai"}, {n: "Jay"}]
     };
 
-    // --- LOGIKA GRY ---
     const getFolderName = (catName) => {
         return catName.replace('LEGO ', '').toLowerCase().trim().replace(/\s+\/\s+/g, '-').replace(/\s+/g, '-');
     };
@@ -430,7 +420,8 @@ const db = {
     }
 
     function joinGame() {
-        const code = document.getElementById('room-input').value.trim();
+        const input = document.getElementById('room-input');
+        const code = input ? input.value.trim() : "";
         if (code.length < 1) return alert("Wpisz kod!");
         enterLobby(code);
     }
@@ -458,7 +449,7 @@ const db = {
             const btn = document.createElement('button');
             btn.className = 'cat-btn';
             btn.innerText = cat.replace('LEGO ', '');
-            btn.onclick = () => initGame(cat);
+            btn.onclick = (e) => { e.stopPropagation(); initGame(cat); };
             container.appendChild(btn);
         });
     }
@@ -477,7 +468,6 @@ const db = {
             pool = db[category].map(char => ({ ...char, folder: folder }));
         }
 
-        // Seedowanie losowości (synchronizacja graczy)
         let seed = 0;
         for (let i = 0; i < roomCode.length; i++) seed = ((seed << 5) - seed) + roomCode.charCodeAt(i);
         const mulberry32 = (a) => () => {
@@ -532,7 +522,7 @@ const db = {
     }
 
     function copyRoomLink() {
-        const url = new URL(window.location.href);
+        const url = new URL(window.location.origin + window.location.pathname);
         url.searchParams.set('room', document.getElementById('display-code').innerText);
         navigator.clipboard.writeText(url.toString()).then(() => alert("Skopiowano link!"));
     }
