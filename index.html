@@ -3,149 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEGO Guess Who - Online</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Minifig Who - Online</title>
     <style>
         :root {
             --lego-yellow: #FFD500;
             --lego-red: #E3000B;
             --lego-blue: #006CB7;
-            --bg-dark: #1a1a1a;
+            --card-bg: rgba(30, 41, 59, 0.7);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-dark);
+            font-family: 'Fredoka', sans-serif;
+            /* Tło z Twojego repozytorium (folder img) */
+            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('img/tlo.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             color: white;
             margin: 0;
             text-align: center;
+            min-height: 100vh;
         }
 
-        #menu, #game-area { padding: 20px; }
+        #menu, #game-area { padding: 40px 20px; }
 
-        .character-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 15px;
-            max-width: 1200px;
-            margin: 20px auto;
-        }
-
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 10px;
-            cursor: pointer;
-            transition: transform 0.2s, opacity 0.3s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            position: relative;
-        }
-
-        .card:hover { transform: scale(1.03); }
-
-        .card.eliminated {
-            opacity: 0.15;
-            filter: grayscale(100%) brightness(0.7);
-            transform: scale(0.95);
-        }
-
-        .bing-badge {
-            position: absolute;
-            top: 3px;
-            right: 3px;
-            background: rgba(0, 108, 183, 0.8);
-            color: white;
-            border: none;
-            padding: 1px 4px;
-            font-size: 7px;
-            font-weight: bold;
-            border-radius: 2px;
-            z-index: 10;
-            pointer-events: none;
+        /* TYTUŁ BRICKLE */
+        h1.main-title {
+            font-weight: 700;
+            font-size: 3.5rem;
+            letter-spacing: 2px;
             text-transform: uppercase;
+            color: var(--lego-yellow);
+            text-shadow: 3px 3px 0px #B45309;
+            margin-bottom: 5px;
         }
 
-        .btn {
-            background: var(--lego-red);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 8px;
+        h1.main-title span { color: var(--lego-red); text-shadow: 3px 3px 0px #900; }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #9CA3AF;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* SIATKA KAFELKÓW STARTOWYCH */
+        .start-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .brickle-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 30px;
             cursor: pointer;
-            margin: 10px;
-            box-shadow: 0 4px #900;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .cat-btn {
-            background: var(--lego-blue);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 13px;
-            transition: background 0.2s;
+        .brickle-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--lego-yellow);
+            box-shadow: 0 0 25px rgba(255, 213, 0, 0.3);
         }
 
-        .cat-btn:hover { background: #0085e4; }
-
-        input {
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 2px solid var(--lego-yellow);
-            width: 200px;
-            text-align: center;
-            background: #333;
-            color: white;
-        }
-
-        .target-box {
-            background: #333;
-            padding: 15px;
-            border-radius: 15px;
-            border: 3px solid var(--lego-yellow);
-            display: inline-block;
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
             margin-bottom: 20px;
         }
+
+        .icon-yellow { background: var(--lego-yellow); color: black; }
+        .icon-red { background: var(--lego-red); color: white; }
+
+        .card-title { font-size: 1.3rem; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
+        .card-desc { font-size: 0.9rem; color: #9CA3AF; }
+
+        input {
+            padding: 12px;
+            font-size: 16px;
+            font-family: 'Fredoka', sans-serif;
+            border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.1);
+            width: 80%;
+            text-align: center;
+            background: rgba(0,0,0,0.4);
+            color: white;
+            margin-top: 15px;
+        }
+
+        input:focus { outline: none; border-color: var(--lego-yellow); }
+
+        /* Lobby i Przyciski kategorii */
+        .cat-btn {
+            background: rgba(255,255,255,0.05);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.1);
+            padding: 12px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .cat-btn:hover { background: var(--lego-blue); border-color: transparent; transform: scale(1.05); }
     </style>
 </head>
 <body>
 
 <div id="menu">
-    <h1 style="color: var(--lego-yellow); text-shadow: 2px 2px #000;">LEGO GUESS WHO</h1>
+    <h1 class="main-title">Minifig <span>Who</span></h1>
+    <p class="subtitle">Zgadnij klockowego ludzika przeciwnika</p>
     
     <div id="setup-view">
-        <button class="btn" onclick="createGame()">NOWY POKÓJ</button>
-        <div style="margin: 25px 0;">
-            <p style="color: #ccc;">WPISZ KOD OD ZNAJOMEGO:</p>
-            <input type="text" id="room-input" placeholder="np. LEGO-123">
-            <button class="btn" style="background: var(--lego-blue); box-shadow: 0 4px #004a7c;" onclick="joinGame()">DOŁĄCZ</button>
+        <div class="start-grid">
+            <div class="brickle-card" onclick="createGame()">
+                <div class="icon-box icon-yellow"><i class="fa-solid fa-plus"></i></div>
+                <div class="card-title">Nowy Pokój</div>
+                <div class="card-desc">Stwórz własną grę i zaproś kogoś kodem.</div>
+            </div>
+
+            <div class="brickle-card" id="join-card">
+                <div class="icon-box icon-red"><i class="fa-solid fa-right-to-bracket"></i></div>
+                <div class="card-title">Dołącz</div>
+                <div class="card-desc">Wpisz kod i kliknij kafelek, aby wejść.</div>
+                <input type="text" id="room-input" placeholder="np. LEGO-123" onclick="event.stopPropagation()">
+                <button class="cat-btn" style="margin-top: 10px; width: 80%;" onclick="joinGame()">WEJDŹ</button>
+            </div>
         </div>
     </div>
 
     <div id="lobby-view" style="display: none; margin-top: 20px;">
-        <div style="background: #333; padding: 20px; border-radius: 15px; border: 2px solid #00ff00; display: inline-block;">
-            <p style="margin: 0; color: #bbb;">KOD POKOJU:</p>
-            <h2 id="display-code" style="margin: 10px 0; font-size: 40px; font-family: monospace; color: white;">---</h2>
-            <button onclick="copyRoomLink()" style="font-size: 11px; background: #555; color: white; border: none; padding: 6px; border-radius: 4px; cursor: pointer;">Skopiuj Link</button>
+        <div style="background: var(--card-bg); padding: 25px; border-radius: 20px; border: 2px solid #00ff00; display: inline-block; backdrop-filter: blur(10px);">
+            <p style="margin: 0; color: #9CA3AF; font-weight: 600;">KOD POKOJU:</p>
+            <h2 id="display-code" style="margin: 10px 0; font-size: 45px; letter-spacing: 3px; color: white;">---</h2>
+            <button onclick="copyRoomLink()" class="cat-btn" style="padding: 6px 12px; font-size: 12px;">Skopiuj Link</button>
         </div>
-        <h3 style="margin: 25px 0;">Wybierz kategorię:</h3>
-        <div id="category-buttons" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 900px; margin: 0 auto;"></div>
+        <h3 style="margin: 30px 0; text-transform: uppercase;">Wybierz kategorię:</h3>
+        <div id="category-buttons" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 900px; margin: 0 auto;"></div>
     </div>
-</div>
-
-<div id="game-area" style="display: none;">
-    <div class="target-box">
-        <p style="margin: 0; color: #aaa; font-size: 14px;">TWOJA POSTAĆ:</p>
-        <h2 id="target-name" style="margin: 5px 0; color: var(--lego-yellow);">---</h2>
-    </div>
-    <div style="margin-bottom: 20px;">
-        <button onclick="location.reload()" style="background: #555; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">Wyjdź do Menu</button>
-    </div>
-    <div id="character-grid" class="character-grid"></div>
 </div>
 
 <script>
