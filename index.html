@@ -33,7 +33,7 @@
             position: relative; 
         }
 
-        /* Klikalne logo jako jedyna opcja powrotu z lobby */
+        /* POPRAWKA LOGO: Poświata i klikalność na całości */
         h1.main-title {
             font-weight: 700;
             font-size: clamp(2.5rem, 8vw, 4rem);
@@ -52,7 +52,16 @@
             text-shadow: 3px 5px 15px rgba(255, 213, 0, 0.4), 3px 3px 0px #B45309;
         }
 
-        h1.main-title span { color: var(--lego-red); text-shadow: 3px 3px 0px #900; }
+        /* POPRAWKA: Dodana poświata dla słowa WHO */
+        h1.main-title span { 
+            color: var(--lego-red); 
+            text-shadow: 3px 3px 0px #900;
+            transition: text-shadow 0.2s ease;
+        }
+
+        h1.main-title:hover span {
+            text-shadow: 3px 5px 15px rgba(227, 0, 11, 0.5), 3px 3px 0px #900;
+        }
 
         .subtitle {
             font-size: 1rem;
