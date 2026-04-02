@@ -126,6 +126,33 @@
 
         .cat-btn:hover { background: var(--lego-blue); border-color: transparent; transform: scale(1.05); }
 
+        #category-buttons .cat-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.3),
+                inset 0 0 10px rgba(255, 255, 255, 0.05);
+            color: white;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #category-buttons .cat-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.4), 
+                inset 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+
+        #category-buttons .cat-btn:active {
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
         .character-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -133,6 +160,7 @@
             max-width: 1200px;
             margin: 20px auto;
         }
+
         .card {
             background: white;
             border-radius: 15px;
@@ -454,17 +482,18 @@
             {n:"Chudy (Toy Story)"}, {n:"Zygzak McQueen (Auta)"}, {n:"Merida Waleczna"}, {n:"Miguel (Coco)"}, {n:"Sulley (Potwory i Spółka)"}
         ]
     };
-const db = {
-        "LEGO STAR WARS": [{n: "Darth Vader"}, {n: "Luke Skywalker"}],
-        "LEGO NINJAGO": [{n: "Kai"}, {n: "Jay"}]
-    };
-
-    const getFolderName = (catName) => {
+const getFolderName = (catName) => {
         return catName.replace('LEGO ', '').toLowerCase().trim().replace(/\s+\/\s+/g, '-').replace(/\s+/g, '-');
     };
 
     function createGame() {
-        const code = "LEGO-" + Math.floor(100 + Math.random() * 899);
+        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; 
+        let randomPart = "";
+        for(let i=0; i<4; i++) {
+            randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        const code = "LEGO-" + randomPart;
+        
         const input = document.getElementById('room-input');
         if(input) input.value = code;
         enterLobby(code);
@@ -490,8 +519,6 @@ const db = {
         
         const mixBtn = document.createElement('button');
         mixBtn.className = 'cat-btn';
-        mixBtn.style.background = 'linear-gradient(45deg, #f59e0b, #ef4444)';
-        mixBtn.style.border = 'none';
         mixBtn.innerHTML = '<i class="fa-solid fa-fire"></i> Tryb Mix';
         mixBtn.onclick = () => initGame('MIX');
         container.appendChild(mixBtn);
@@ -519,7 +546,7 @@ const db = {
             pool = db[category].map(char => ({ ...char, folder: folder }));
         }
 
-        let seed = Date.now();
+        let seed = 0;
         for (let i = 0; i < roomCode.length; i++) seed = ((seed << 5) - seed) + roomCode.charCodeAt(i);
         
         const mulberry32 = (a) => () => {
@@ -536,6 +563,7 @@ const db = {
         }
 
         const selected = pool.slice(0, 24);
+
         const target = selected[Math.floor(rand() * selected.length)];
         document.getElementById('target-name').innerText = target.n;
 
