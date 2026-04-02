@@ -33,7 +33,6 @@
             position: relative; 
         }
 
-        /* POPRAWKA LOGO: Poświata i klikalność na całości */
         h1.main-title {
             font-weight: 700;
             font-size: clamp(2.5rem, 8vw, 4rem);
@@ -52,7 +51,6 @@
             text-shadow: 3px 5px 15px rgba(255, 213, 0, 0.4), 3px 3px 0px #B45309;
         }
 
-        /* POPRAWKA: Dodana poświata dla słowa WHO */
         h1.main-title span { 
             color: var(--lego-red); 
             text-shadow: 3px 3px 0px #900;
@@ -346,7 +344,7 @@
         <img src="img/Discord.png" alt="Discord">
     </div>
 
-    <h1 class="main-title" onclick="location.reload()" title="Powrót do menu">Minifig <span>Who</span></h1>
+    <h1 class="main-title" onclick="window.location.href = window.location.pathname;" title="Powrót do menu">Minifig <span>Who</span></h1>
     <p class="subtitle">Zgadnij postać przeciwnika</p>
     
     <div id="setup-view">
@@ -395,7 +393,7 @@
     </div>
     
     <div style="margin-bottom: 20px;">
-        <button onclick="location.reload()" class="exit-btn">Wyjdź do Menu</button>
+        <button onclick="window.location.href = window.location.pathname;" class="exit-btn">Wyjdź do Menu</button>
     </div>
     
     <div id="character-grid" class="character-grid"></div>
