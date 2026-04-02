@@ -133,7 +133,6 @@
             max-width: 1200px;
             margin: 20px auto;
         }
-
         .card {
             background: white;
             border-radius: 15px;
@@ -145,8 +144,7 @@
             border: 3px solid transparent;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            min-height: 220px; /* Zabezpieczenie równej wysokości kart */
+            align-items: center;
         }
 
         .card:hover { transform: translateY(-3px); border-color: var(--lego-yellow); }
@@ -158,6 +156,7 @@
         }
 
         .card-img-container {
+            width: 100%;
             height: 160px;
             background: #f3f4f6;
             border-radius: 10px;
@@ -170,16 +169,14 @@
 
         .main-img { max-width: 90%; max-height: 90%; object-fit: contain; }
 
-        /* ZMIANA: Usunięto 'nowrap' i 'ellipsis' - tekst teraz widać w całości! */
         .card-name {
             color: #111;
             font-size: 11px;
             font-weight: 700;
-            margin-top: 10px;
+            margin-top: 10px; 
             text-transform: uppercase;
             white-space: normal; 
             overflow: visible;
-            text-overflow: clip;
             text-align: center;
             line-height: 1.2;
         }
@@ -457,7 +454,12 @@
             {n:"Chudy (Toy Story)"}, {n:"Zygzak McQueen (Auta)"}, {n:"Merida Waleczna"}, {n:"Miguel (Coco)"}, {n:"Sulley (Potwory i Spółka)"}
         ]
     };
-const getFolderName = (catName) => {
+const db = {
+        "LEGO STAR WARS": [{n: "Darth Vader"}, {n: "Luke Skywalker"}],
+        "LEGO NINJAGO": [{n: "Kai"}, {n: "Jay"}]
+    };
+
+    const getFolderName = (catName) => {
         return catName.replace('LEGO ', '').toLowerCase().trim().replace(/\s+\/\s+/g, '-').replace(/\s+/g, '-');
     };
 
@@ -517,7 +519,6 @@ const getFolderName = (catName) => {
             pool = db[category].map(char => ({ ...char, folder: folder }));
         }
 
-        // ZMIANA: Dodano Date.now() do ziarna kodu pokoju, aby postacie nie były zawsze takie same
         let seed = Date.now();
         for (let i = 0; i < roomCode.length; i++) seed = ((seed << 5) - seed) + roomCode.charCodeAt(i);
         
