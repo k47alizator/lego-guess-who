@@ -344,7 +344,7 @@
         <img src="img/Discord.png" alt="Discord">
     </div>
 
-    <h1 class="main-title" onclick="window.location.href = window.location.pathname;" title="Powrót do menu">Minifig <span>Who</span></h1>
+    <h1 class="main-title" onclick="window.location.href = window.location.pathname;" title="Powrót do menu start">Minifig <span>Who</span></h1>
     <p class="subtitle">Zgadnij postać przeciwnika</p>
     
     <div id="setup-view">
@@ -393,7 +393,7 @@
     </div>
     
     <div style="margin-bottom: 20px;">
-        <button onclick="window.location.href = window.location.pathname;" class="exit-btn">Wyjdź do Menu</button>
+        <button onclick="backToLobby()" class="exit-btn">Powrót do kategorii</button>
     </div>
     
     <div id="character-grid" class="character-grid"></div>
@@ -595,6 +595,12 @@ const getFolderName = (catName) => {
         document.getElementById('lobby-view').style.display = 'block';
         document.getElementById('display-code').innerText = code;
         generateCategoryButtons();
+    }
+
+    // NOWOŚĆ: Funkcja powrotu z samej planszy do wyboru kategorii
+    function backToLobby() {
+        document.getElementById('game-area').style.display = 'none';
+        document.getElementById('menu').style.display = 'block';
     }
 
     function generateCategoryButtons() {
