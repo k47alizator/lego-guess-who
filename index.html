@@ -266,7 +266,7 @@
                 <input type="text" id="room-input" placeholder="np. LEGO-123" 
                        onclick="event.stopPropagation()" 
                        onkeypress="if(event.key === 'Enter') joinGame()">
-                <button class="cat-btn" style="margin-top: 15px; width: 85%;">WEJDŹ</button>
+                <button class="cat-btn" style="margin-top: 15px; width: 85%;" onclick="joinGame()">WEJDŹ</button>
             </div>
         </div>
     </div>
@@ -451,12 +451,7 @@
             {n:"Chudy (Toy Story)"}, {n:"Zygzak McQueen (Auta)"}, {n:"Merida Waleczna"}, {n:"Miguel (Coco)"}, {n:"Sulley (Potwory i Spółka)"}
         ]
     };
-const db = {
-        "LEGO STAR WARS": [{n: "Darth Vader"}, {n: "Luke Skywalker"}],
-        "LEGO NINJAGO": [{n: "Kai"}, {n: "Jay"}]
-    };
-
-    const getFolderName = (catName) => {
+const getFolderName = (catName) => {
         return catName.replace('LEGO ', '').toLowerCase().trim().replace(/\s+\/\s+/g, '-').replace(/\s+/g, '-');
     };
 
