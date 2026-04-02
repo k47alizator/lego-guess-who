@@ -75,14 +75,12 @@
             align-items: center;
         }
 
-        /* Hover dla karty STWÓRZ GRĘ (Żółty) */
         .brickle-card.create-card:hover {
             transform: translateY(-5px) scale(1.02);
             border-color: var(--lego-yellow);
             box-shadow: 0 15px 35px rgba(255, 213, 0, 0.2), 0 0 15px rgba(255, 213, 0, 0.1);
         }
 
-        /* NOWOŚĆ: Hover dla karty DOŁĄCZ (Czerwony) */
         .brickle-card.join-card:hover {
             transform: translateY(-5px) scale(1.02);
             border-color: var(--lego-red);
@@ -211,6 +209,12 @@
 
         .card:hover { transform: translateY(-3px); border-color: var(--lego-yellow); }
 
+        /* NOWOŚĆ: Specjalna ramka dla Twojej wylosowanej postaci */
+        .card.target-character {
+            border-color: var(--lego-red) !important;
+            box-shadow: 0 8px 25px rgba(227, 0, 11, 0.4), 0 0 15px rgba(227, 0, 11, 0.2);
+        }
+
         .card.eliminated {
             opacity: 0.15;
             filter: grayscale(100%);
@@ -265,7 +269,6 @@
             backdrop-filter: blur(10px);
         }
 
-        /* OBRAZEK UDOSTĘPNIANIA (ZAMIAST PRZYCISKU KOPIUJ) */
         .share-icon-btn {
             width: 32px;
             height: 32px;
@@ -516,7 +519,7 @@
         ]
     };
 
- const getFolderName = (catName) => {
+const getFolderName = (catName) => {
         return catName.replace('LEGO ', '').toLowerCase().trim().replace(/\s+\/\s+/g, '-').replace(/\s+/g, '-');
     };
 
@@ -615,7 +618,14 @@
 
         selected.forEach(char => {
             const card = document.createElement('div');
-            card.className = 'card';
+            
+            // TUTAJ dodajemy klasę .target-character jeśli postać zgadza się z wylosowaną
+            if (char.n === target.n) {
+                card.className = 'card target-character';
+            } else {
+                card.className = 'card';
+            }
+
             const extensions = ['jpg', 'png', 'webp', 'jpeg'];
             let extIdx = 0;
 
