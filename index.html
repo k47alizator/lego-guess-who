@@ -157,6 +157,22 @@
                 inset 0 0 15px rgba(255, 255, 255, 0.1);
         }
 
+        #category-buttons .cat-btn-mix {
+            border: 2px solid rgba(227, 0, 11, 0.5) !important;
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.3),
+                0 0 10px rgba(227, 0, 11, 0.2),
+                inset 0 0 10px rgba(255, 255, 255, 0.05) !important;
+        }
+
+        #category-buttons .cat-btn-mix:hover {
+            border-color: rgba(255, 213, 0, 0.8) !important;
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.4),
+                0 0 20px rgba(255, 213, 0, 0.4), 
+                inset 0 0 15px rgba(255, 255, 255, 0.1) !important;
+        }
+
         #category-buttons .cat-btn:active, .action-btn:active {
             transform: translateY(1px) scale(0.98);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -279,14 +295,15 @@
                 <div class="card-desc">Załóż nowy pokój i zaproś znajomego.</div>
             </div>
 
-            <div class="brickle-card" onclick="joinGame()">
+            <div class="brickle-card" style="cursor: default;">
                 <div class="icon-box icon-red"><i class="fa-solid fa-right-to-bracket"></i></div>
                 <div class="card-title">Dołącz</div>
                 <div class="card-desc">Wpisz kod i wejdź do wspólnej zabawy.</div>
-                <input type="text" id="room-input" placeholder="np. LEGO-123" 
+                <input type="text" id="room-input" placeholder="np. 1234" 
                        onclick="event.stopPropagation()" 
                        onkeypress="if(event.key === 'Enter') joinGame()">
-                <button class="action-btn" style="margin-top: 15px; width: 85%; padding: 12px; font-weight: 600; border-radius: 12px; cursor: pointer; text-transform: uppercase;" onclick="joinGame()">WEJDŹ</button>
+                
+                <button class="action-btn" style="margin-top: 15px; width: 80%; padding: 12px; font-weight: 600; border-radius: 12px; cursor: pointer; text-transform: uppercase;" onclick="joinGame()">WEJDŹ</button>
             </div>
         </div>
     </div>
@@ -472,19 +489,17 @@
         ]
     };
 
-    const getFolderName = (catName) => {
+   const getFolderName = (catName) => {
         return catName.replace('LEGO ', '').toLowerCase().trim().replace(/\s+\/\s+/g, '-').replace(/\s+/g, '-');
     };
 
-    // FUNKCJA TWORZENIA GRY - Zmienia teraz pasek adresu URL!
+    // GENEROWANIE 4 CYFR ZAMIAST "LEGO-XXXX"
     function createGame() {
-        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; 
-        let code = "LEGO-";
+        let code = "";
         for(let i=0; i<4; i++) {
-            code += chars.charAt(Math.floor(Math.random() * chars.length));
+            code += Math.floor(Math.random() * 10).toString();
         }
         
-        // POPRAWKA: Dopisujemy kod do paska adresu URL!
         const url = new URL(window.location);
         url.searchParams.set('room', code);
         window.history.pushState({}, '', url);
@@ -494,12 +509,15 @@
 
     function joinGame() {
         const input = document.getElementById('room-input');
-        const code = input ? input.value.trim() : "";
-        if (code.length < 1) return alert("Wpisz kod!");
+        let code = input ? input.value.trim().replace(/\s+/g, '') : "";
         
-        // DOPISANIE do paska przy dołączaniu przez pole tekstowe
+        if (code.length < 1) {
+            createGame();
+            return;
+        }
+
         const url = new URL(window.location);
-        url.searchParams.set('room', code.toUpperCase());
+        url.searchParams.set('room', code);
         window.history.pushState({}, '', url);
 
         enterLobby(code);
@@ -508,7 +526,7 @@
     function enterLobby(code) {
         document.getElementById('setup-view').style.display = 'none';
         document.getElementById('lobby-view').style.display = 'block';
-        document.getElementById('display-code').innerText = code.toUpperCase();
+        document.getElementById('display-code').innerText = code;
         generateCategoryButtons();
     }
 
@@ -525,7 +543,7 @@
         });
 
         const mixBtn = document.createElement('button');
-        mixBtn.className = 'cat-btn';
+        mixBtn.className = 'cat-btn cat-btn-mix';
         mixBtn.innerHTML = '<i class="fa-solid fa-fire"></i> Tryb Mix';
         mixBtn.onclick = () => initGame('MIX');
         container.appendChild(mixBtn);
@@ -563,7 +581,6 @@
 
         const selected = pool.slice(0, 24);
 
-        // Losowanie całkowicie losowe (unikalny cel dla każdego gracza)
         const target = selected[Math.floor(Math.random() * selected.length)];
         document.getElementById('target-name').innerText = target.n;
 
@@ -605,12 +622,11 @@
         navigator.clipboard.writeText(window.location.href).then(() => alert("Skopiowano link do pokoju!"));
     }
 
-    // Automatyczne wchodzenie, gdy link ma już w sobie kod pokoju
     window.addEventListener('load', () => {
         const params = new URLSearchParams(window.location.search);
         const room = params.get('room');
         if (room) {
-            enterLobby(room.toUpperCase());
+            enterLobby(room);
         }
     });
 </script>
