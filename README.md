@@ -1,14 +1,6 @@
-# Minifig Who
+# [Minifig Who](https://k47alizator.github.io/Minifig-Who/)
 
 **Minifig Who** to darmowa, fanowska gra przeglądarkowa wzorowana na klasycznym tytule "Zgadnij kto to?", osadzona w świecie najpopularniejszych klocków na świecie. Graj ze znajomymi online, wybieraj ulubione uniwersa i eliminuj postacie, by odgadnąć minifigurkę przeciwnika!
-
----
-
-## Zagraj teraz
-
-Kliknij w poniższy kafelek, aby przejść bezpośrednio do gry w swojej przeglądarce:
-
-[![Graj w Minifig Who](https://img.shields.io/badge/ZAGRAJ%20TERAZ-Minifig%20Who-FFD500?style=for-the-badge&logo=lego&logoColor=000&labelColor=E3000B)](https://k47alizator.github.io/Minifig-Who/)
 
 ---
 
@@ -16,7 +8,7 @@ Kliknij w poniższy kafelek, aby przejść bezpośrednio do gry w swojej przegl�
 
 Masz pomysł na nową kategorię? Chcesz zgłosić błąd lub znaleźć kogoś do wspólnej rozgrywki? Dołącz do naszego serwera na Discordzie!
 
-[![Discord](https://img.shields.io/badge/Dołącz%20do-Discorda-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/invite/FeBT9tVEsY)
+Link do społeczności: [Serwer Discord](https://discord.com/invite/FeBT9tVEsY)
 
 ---
 
@@ -27,7 +19,7 @@ Zależy mi na tym, aby gra działała jak najlepiej! Jeśli podczas rozgrywki:
 * Zauważysz błąd w nazwie postaci,
 * Coś na stronie wyświetli się niepoprawnie,
 
-...koniecznie daj mi o tym znać! **Wejdź na nasz [serwer Discord](https://discord.com/invite/FeBT9tVEsY)** i opisz problem na dedykowanym kanale dla zgłoszeń. Każda pomoc w ulepszaniu gry jest na wagę złota!
+koniecznie daj mi o tym znać! Wejdź na nasz serwer Discord i opisz problem na dedykowanym kanale dla zgłoszeń. Każda pomoc w ulepszaniu gry jest na wagę złota!
 
 ---
 
