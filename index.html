@@ -74,9 +74,9 @@
 
         .start-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
         }
 
@@ -85,27 +85,25 @@
             backdrop-filter: blur(12px);
             border: 2px solid rgba(255, 255, 255, 0.05);
             border-radius: 24px;
-            padding: 25px;
+            padding: 30px;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
         }
 
-        .brickle-card:hover {
+        .brickle-card.create-card:hover {
             transform: translateY(-5px) scale(1.02);
             border-color: var(--lego-yellow);
-            box-shadow: 0 15px 35px rgba(255, 213, 0, 0.15), 0 0 15px rgba(255, 213, 0, 0.05);
+            box-shadow: 0 15px 35px rgba(255, 213, 0, 0.2), 0 0 15px rgba(255, 213, 0, 0.1);
         }
 
-        /* Aktywny kafel wyboru liczby kart z czerwoną poświatą */
-        .brickle-card.active {
-            border-color: var(--lego-red) !important;
-            box-shadow: 0 15px 35px rgba(227, 0, 11, 0.25), 0 0 15px rgba(227, 0, 11, 0.15) !important;
-            background: rgba(227, 0, 11, 0.05);
+        .brickle-card.join-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: var(--lego-red);
+            box-shadow: 0 15px 35px rgba(227, 0, 11, 0.2), 0 0 15px rgba(227, 0, 11, 0.1);
         }
 
         .brickle-card:active {
@@ -113,23 +111,22 @@
         }
 
         .icon-box {
-            width: 55px;
-            height: 55px;
-            border-radius: 16px;
+            width: 65px;
+            height: 65px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            margin-bottom: 15px;
+            font-size: 28px;
+            margin-bottom: 20px;
             box-shadow: 0 8px 15px rgba(0,0,0,0.3);
         }
 
         .icon-yellow { background: var(--lego-yellow); color: #000; }
         .icon-red { background: var(--lego-red); color: #fff; }
-        .icon-blue { background: var(--lego-blue); color: #fff; }
 
-        .card-title { font-size: 1.3rem; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; }
-        .card-desc { font-size: 0.9rem; color: #9CA3AF; line-height: 1.4; }
+        .card-title { font-size: 1.4rem; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
+        .card-desc { font-size: 0.95rem; color: #9CA3AF; line-height: 1.4; }
 
         input {
             padding: 12px;
@@ -222,6 +219,46 @@
         .cat-btn:active, .action-btn:active, .exit-btn:active {
             transform: translateY(1px) scale(0.98);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* STYLe WYBORU LICZBY KART (Kompaktowe przyciski) */
+        .size-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0 35px;
+        }
+
+        .size-btn {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: #9CA3AF;
+            padding: 12px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-family: 'Fredoka', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .size-btn:hover {
+            border-color: rgba(255, 213, 0, 0.5);
+            color: white;
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Aktywny ma teraz czerwone obramowanie i poświatę (zamiast żółtego) */
+        .size-btn.active {
+            background: rgba(227, 0, 11, 0.15);
+            border-color: var(--lego-red);
+            color: white;
+            box-shadow: 
+                0 8px 25px rgba(227, 0, 11, 0.4),
+                0 0 15px rgba(227, 0, 11, 0.2);
         }
 
         .character-grid {
@@ -429,25 +466,11 @@
             </div>
         </div>
         
-        <h3 style="margin: 30px 0 15px; text-transform: uppercase; letter-spacing: 2px;">Liczba kart na planszy:</h3>
-        <div class="start-grid" style="margin-bottom: 40px; max-width: 700px;">
-            <div class="brickle-card active size-card" onclick="setBoardSize(21, this)">
-                <div class="icon-box icon-yellow"><i class="fa-solid fa-grip"></i></div>
-                <div class="card-title">21 kart</div>
-                <div class="card-desc">Szybka i dynamiczna rozgrywka.</div>
-            </div>
-
-            <div class="brickle-card size-card" onclick="setBoardSize(28, this)">
-                <div class="icon-box icon-blue"><i class="fa-solid fa-grip-vertical"></i></div>
-                <div class="card-title">28 kart</div>
-                <div class="card-desc">Dłuższe i bardziej wymagające starcie.</div>
-            </div>
-
-            <div class="brickle-card size-card" onclick="setBoardSize(35, this)">
-                <div class="icon-box icon-red"><i class="fa-solid fa-table-cells"></i></div>
-                <div class="card-title">35 kart</div>
-                <div class="card-desc">Wielka plansza dla prawdziwych mistrzów.</div>
-            </div>
+        <h3 style="margin: 30px 0 10px; text-transform: uppercase; font-size: 14px; color: #9CA3AF; letter-spacing: 1px;">Liczba kart na planszy:</h3>
+        <div class="size-selector">
+            <button class="size-btn active" onclick="setBoardSize(21, this)">21 kart</button>
+            <button class="size-btn" onclick="setBoardSize(28, this)">28 kart</button>
+            <button class="size-btn" onclick="setBoardSize(35, this)">35 kart</button>
         </div>
 
         <h3 style="margin: 20px 0 20px; text-transform: uppercase; letter-spacing: 2px;">Wybierz kategorię:</h3>
@@ -631,20 +654,17 @@
             {n:"Chudy (Toy Story)"}, {n:"Zygzak McQueen (Auta)"}, {n:"Merida Waleczna"}, {n:"Miguel (Coco)"}, {n:"Sulley (Potwory i Spółka)"}
         ]
   };
-
-    let currentBoardSize = 21;
+let currentBoardSize = 21;
 
     const getFolderName = (catName) => {
         return catName.replace('LEGO ', '').toLowerCase().trim().replace(/\s+\/\s+/g, '-').replace(/\s+/g, '-');
     };
 
-    // Funkcja do zmiany rozmiaru planszy
     function setBoardSize(size, element) {
         currentBoardSize = size;
         
-        // Zmień klasę active na kafelkach
-        const cards = document.querySelectorAll('.size-card');
-        cards.forEach(card => card.classList.remove('active'));
+        const buttons = document.querySelectorAll('.size-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
         element.classList.add('active');
     }
 
@@ -738,7 +758,6 @@
             [pool[i], pool[j]] = [pool[j], pool[i]];
         }
 
-        // Tnąco ucinamy pulę kart na podstawie wybranego kafelka
         const selected = pool.slice(0, currentBoardSize);
 
         const target = selected[Math.floor(Math.random() * selected.length)];
