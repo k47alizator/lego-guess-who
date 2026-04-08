@@ -45,24 +45,11 @@
             text-shadow: 3px 3px 0px #B45309;
             margin-bottom: 5px;
             cursor: pointer;
-            transition: transform 0.2s ease, text-shadow 0.2s ease;
+            transition: transform 0.2s ease;
             display: inline-block;
         }
 
-        h1.main-title:hover {
-            transform: scale(1.03);
-            text-shadow: 3px 5px 15px rgba(255, 213, 0, 0.4), 3px 3px 0px #B45309;
-        }
-
-        h1.main-title span { 
-            color: var(--lego-red); 
-            text-shadow: 3px 3px 0px #900;
-            transition: text-shadow 0.2s ease;
-        }
-
-        h1.main-title:hover span {
-            text-shadow: 3px 5px 15px rgba(227, 0, 11, 0.5), 3px 3px 0px #900;
-        }
+        h1.main-title span { color: var(--lego-red); text-shadow: 3px 3px 0px #900; }
 
         .subtitle {
             font-size: 1rem;
@@ -94,223 +81,89 @@
             align-items: center;
         }
 
-        .brickle-card.create-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            border-color: var(--lego-yellow);
-            box-shadow: 0 15px 35px rgba(255, 213, 0, 0.2), 0 0 15px rgba(255, 213, 0, 0.1);
-        }
-
-        .brickle-card.join-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            border-color: var(--lego-red);
-            box-shadow: 0 15px 35px rgba(227, 0, 11, 0.2), 0 0 15px rgba(227, 0, 11, 0.1);
-        }
+        .brickle-card:hover { transform: translateY(-5px); }
+        .create-card:hover { border-color: var(--lego-yellow); }
+        .join-card:hover { border-color: var(--lego-red); }
 
         .icon-box {
-            width: 65px;
-            height: 65px;
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+            width: 65px; height: 65px; border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; margin-bottom: 20px;
         }
-
         .icon-yellow { background: var(--lego-yellow); color: #000; }
         .icon-red { background: var(--lego-red); color: #fff; }
 
-        .card-title { font-size: 1.4rem; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
-        .card-desc { font-size: 0.95rem; color: #9CA3AF; line-height: 1.4; }
-
         input {
-            padding: 12px;
-            font-size: 16px;
-            font-family: 'Fredoka', sans-serif;
-            border-radius: 12px;
-            border: 2px solid rgba(255,255,255,0.1);
-            width: 80%;
-            text-align: center;
-            background: rgba(0,0,0,0.4);
-            color: white;
-            margin-top: 20px;
-            transition: all 0.3s;
+            padding: 12px; font-size: 16px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.1);
+            width: 80%; text-align: center; background: rgba(0,0,0,0.4); color: white; margin-top: 20px;
         }
 
         .cat-btn, .action-btn, .exit-btn {
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(20px);
-            color: white;
-            cursor: pointer;
-            font-weight: 600;
-            text-transform: uppercase;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.07); backdrop-filter: blur(20px);
+            color: white; cursor: pointer; font-weight: 600; text-transform: uppercase;
+            transition: all 0.3s; border: 2px solid rgba(255, 213, 0, 0.4);
+            padding: 12px 20px; border-radius: 12px;
         }
 
-        #category-buttons .cat-btn, .action-btn {
-            border: 2px solid rgba(255, 213, 0, 0.4);
-            padding: 12px 20px;
-            border-radius: 12px;
-        }
+        .cat-btn:hover, .action-btn:hover { border-color: var(--lego-red); background: rgba(255,255,255,0.15); }
 
-        .exit-btn {
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-size: 13px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .size-selector {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 15px 0 35px;
-        }
-
+        .size-selector { display: flex; justify-content: center; gap: 15px; margin: 15px 0 35px; }
         .size-btn {
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(12px);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            color: #9CA3AF;
-            padding: 12px 25px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-family: 'Fredoka', sans-serif;
-            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.07); border: 2px solid rgba(255, 255, 255, 0.1);
+            color: #9CA3AF; padding: 10px 20px; border-radius: 12px; cursor: pointer; transition: 0.3s;
         }
-
-        .size-btn.active {
-            background: rgba(227, 0, 11, 0.15);
-            border-color: var(--lego-red);
-            color: white;
-        }
+        .size-btn.active { background: rgba(227, 0, 11, 0.2); border-color: var(--lego-red); color: white; }
 
         .character-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            max-width: 1200px;
-            margin: 20px auto;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px; max-width: 1200px; margin: 20px auto;
         }
 
         .card {
-            background: white;
-            border-radius: 15px;
-            padding: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-            position: relative;
-            border: 3px solid transparent;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background: white; border-radius: 15px; padding: 10px; cursor: pointer;
+            transition: all 0.2s; box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            border: 3px solid transparent; display: flex; flex-direction: column; align-items: center;
         }
-
-        .card:hover { transform: translateY(-3px); border-color: var(--lego-yellow); }
-
-
-        .card.eliminated {
-            opacity: 0.15;
-            filter: grayscale(100%);
-            transform: scale(0.92);
-        }
+        .card:hover { border-color: var(--lego-yellow); }
+        .card.eliminated { opacity: 0.15; filter: grayscale(100%); transform: scale(0.92); }
 
         .card-img-container {
-            width: 100%;
-            height: 160px;
-            background: #f3f4f6;
-            border-radius: 10px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
+            width: 100%; height: 160px; background: #f3f4f6; border-radius: 10px;
+            overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;
         }
-
         .main-img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        .card-name { color: #111; font-size: 11px; font-weight: 700; margin-top: 10px; text-transform: uppercase; }
 
-        .card-name {
-            color: #111;
-            font-size: 11px;
-            font-weight: 700;
-            margin-top: 10px; 
-            text-transform: uppercase;
-            text-align: center;
-        }
-
-        .bing-badge {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            background: var(--lego-blue);
-            color: white;
-            font-size: 8px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            display: none;
-        }
-
+        /* --- STYL PANELU TWOJEJ POSTACI --- */
         .target-box {
-            background: var(--card-bg);
-            padding: 10px 20px;
-            border-radius: 20px;
-            border: 3px solid var(--lego-yellow);
-            display: inline-flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 30px;
-            backdrop-filter: blur(10px);
-            text-align: left;
+            background: var(--card-bg); padding: 10px 20px; border-radius: 20px;
+            border: 3px solid var(--lego-yellow); display: inline-flex; align-items: center;
+            gap: 15px; margin-bottom: 30px; backdrop-filter: blur(10px); text-align: left;
         }
-
         .target-img-container {
-            width: 60px;
-            height: 60px;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid rgba(255,255,255,0.1);
+            width: 60px; height: 60px; background: white; border-radius: 12px;
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
         }
+        .target-img-container img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        .target-text-container { display: flex; flex-direction: column; }
 
-        .target-img-container img {
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
-        }
-
-        .target-text-container {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .share-icon-btn {
-            width: 26px; height: 26px; cursor: pointer; transition: all 0.2s ease; vertical-align: middle;
-        }
+        .share-icon-btn { width: 26px; cursor: pointer; transition: 0.2s; }
+        .share-icon-btn:hover { transform: scale(1.2); }
 
         .discord-corner {
-            position: absolute; top: 20px; right: 20px; width: 55px; height: 55px;
+            position: absolute; top: 20px; right: 20px; width: 50px; height: 50px;
             background: #5865F2; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 1000; border: 2px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer; z-index: 1000;
         }
         .discord-corner img { width: 60%; }
 
         .game-logo {
             position: absolute; top: 20px; left: 20px; font-weight: 700; font-size: 1.6rem;
-            color: var(--lego-yellow); text-shadow: 2px 2px 0px #B45309; cursor: pointer; text-transform: uppercase;
+            color: var(--lego-yellow); text-shadow: 2px 2px 0px #B45309; cursor: pointer;
         }
-        .game-logo span { color: var(--lego-red); text-shadow: 2px 2px 0px #900; }
+        .game-logo span { color: var(--lego-red); }
 
-        .lego-footer {
-            width: 100%; padding: 15px 10px; font-size: 10px; color: rgba(156, 163, 175, 0.4);
-            background: rgba(15, 23, 42, 0.5); box-sizing: border-box;
-        }
+        .lego-footer { width: 100%; padding: 15px; font-size: 10px; color: rgba(156, 163, 175, 0.4); background: rgba(15, 23, 42, 0.5); }
     </style>
 </head>
 <body>
@@ -334,7 +187,7 @@
             <div class="brickle-card join-card">
                 <div class="icon-box icon-red"><i class="fa-solid fa-right-to-bracket"></i></div>
                 <div class="card-title">Dołącz</div>
-                <input type="text" id="room-input" placeholder="np. 1234" onclick="event.stopPropagation()">
+                <input type="text" id="room-input" placeholder="Kod pokoju" onclick="event.stopPropagation()">
                 <button class="action-btn" style="margin-top: 15px; width: 80%;" onclick="joinGame()">WEJDŹ</button>
             </div>
         </div>
@@ -343,13 +196,13 @@
     <div id="lobby-view" style="display: none;">
         <div style="background: var(--card-bg); padding: 12px 25px; border-radius: 15px; border: 2px solid var(--lego-red); display: inline-flex; align-items: center; gap: 20px;">
             <div style="text-align: left;">
-                <p style="margin: 0; color: #9CA3AF; font-size: 11px; text-transform: uppercase;">KOD POKOJU:</p>
+                <p style="margin: 0; color: #9CA3AF; font-size: 11px;">KOD POKOJU:</p>
                 <h2 id="display-code" style="margin: 0; font-size: 32px; color: white;">---</h2>
             </div>
-            <img src="img/Share symbol.png" class="share-icon-btn" onclick="copyRoomLink()">
+            <img src="img/Share symbol.png" class="share-icon-btn" onclick="copyRoomLink()" title="Kopiuj link">
         </div>
         
-        <h3 style="margin-top: 30px; text-transform: uppercase; font-size: 14px; color: #9CA3AF;">Liczba kart:</h3>
+        <h3 style="margin-top: 30px; text-transform: uppercase; font-size: 14px; color: #9CA3AF;">Wybierz wielkość planszy:</h3>
         <div class="size-selector">
             <button class="size-btn" onclick="setBoardSize(21, this)">21</button>
             <button class="size-btn active" onclick="setBoardSize(28, this)">28</button>
@@ -373,7 +226,7 @@
     </div>
     
     <div style="margin-bottom: 20px;">
-        <button onclick="backToLobby()" class="exit-btn">Powrót do menu</button>
+        <button onclick="backToLobby()" class="exit-btn">Zmień kategorię</button>
     </div>
     
     <div id="character-grid" class="character-grid"></div>
@@ -385,6 +238,7 @@
 
 <script>
     const githubConfig = { user: "k47alizator", repo: "Minifig-Who", folder: "img" };
+    
     const db = {
         "LEGO STAR WARS": [
             {n:"Luke Skywalker (z Tatooine)"}, {n:"Luke Skywalker (Pilot X-Wing)"}, {n:"Luke Skywalker (z Bespin)"}, {n:"Luke Skywalker (z Dagobah)"}, {n:"Luke Skywalker (Rycerz Jedi)"}, {n:"Luke Skywalker (z Endor)"}, {n:"Luke Skywalker (Szturmowiec)"}, {n:"Luke Skywalker (z Hoth)"}, {n:"Luke Skywalker (Ceremonia)"}, {n:"Luke Skywalker (Stary Luke)"}, {n:"Luke Skywalker (z Crait)"}, {n:"Luke Skywalker (Zbiornik Bacta)"}, {n:"Luke Skywalker (Pilot Śmigacza)"},
@@ -547,27 +401,33 @@ let currentBoardSize = 28;
 
     function createGame() {
         let code = Math.floor(1000 + Math.random() * 9000).toString();
+        updateUrlAndEnter(code);
+    }
+
+    function joinGame() {
+        const code = document.getElementById('room-input').value.trim();
+        if (code) updateUrlAndEnter(code);
+    }
+
+    function updateUrlAndEnter(code) {
         const url = new URL(window.location);
         url.searchParams.set('room', code);
         window.history.pushState({}, '', url);
         enterLobby(code);
     }
 
-    function joinGame() {
-        const code = document.getElementById('room-input').value.trim();
-        if (code) enterLobby(code);
-    }
-
     function enterLobby(code) {
         document.getElementById('setup-view').style.display = 'none';
+        document.getElementById('game-area').style.display = 'none';
+        document.getElementById('menu').style.display = 'block';
         document.getElementById('lobby-view').style.display = 'block';
         document.getElementById('display-code').innerText = code;
         generateCategoryButtons();
     }
 
     function backToLobby() {
-        document.getElementById('game-area').style.display = 'none';
-        document.getElementById('menu').style.display = 'block';
+        const params = new URLSearchParams(window.location.search);
+        enterLobby(params.get('room') || "----");
     }
 
     function generateCategoryButtons() {
@@ -584,56 +444,53 @@ let currentBoardSize = 28;
 
     function initGame(category) {
         const roomCode = document.getElementById('display-code').innerText;
-        let pool = [];
         const folder = getFolderName(category);
-        pool = db[category].map(char => ({ ...char, folder: folder }));
+        let pool = db[category].map(char => ({ ...char, folder: folder }));
 
+        // Generator losowy oparty na kodzie pokoju (ten sam zestaw dla obu graczy)
         let seed = 0;
         for (let i = 0; i < roomCode.length; i++) seed = ((seed << 5) - seed) + roomCode.charCodeAt(i);
         const rand = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
 
         pool.sort(() => rand() - 0.5);
         const selected = pool.slice(0, currentBoardSize);
+        
+        // TWOJA POSTAĆ (losowana niezależnie dla każdego gracza)
         const target = selected[Math.floor(Math.random() * selected.length)];
 
+        // Ustawienie panelu Twojej Postaci
         document.getElementById('target-name').innerText = target.n;
         const targetImg = document.getElementById('target-img');
-        const extensions = ['jpg', 'png', 'webp', 'jpeg'];
-        let tExtIdx = 0;
-
+        
         const getUrl = (name, fold, ext) => `https://raw.githubusercontent.com/${githubConfig.user}/${githubConfig.repo}/main/${githubConfig.folder}/${fold}/${encodeURIComponent(name)}.${ext}`;
         const bingFallback = (name) => `https://tse2.mm.bing.net/th?q=lego+${encodeURIComponent(name.replace(/\(.*\)/, ''))}+minifigure&w=100&h=100&c=7`;
 
-        targetImg.src = getUrl(target.n, target.folder, extensions[0]);
+        const exts = ['jpg', 'png', 'webp', 'jpeg'];
+        let tIdx = 0;
+        targetImg.src = getUrl(target.n, target.folder, exts[0]);
         targetImg.onerror = function() {
-            if (++tExtIdx < extensions.length) this.src = getUrl(target.n, target.folder, extensions[tExtIdx]);
+            if (++tIdx < exts.length) this.src = getUrl(target.n, target.folder, exts[tIdx]);
             else this.src = bingFallback(target.n);
         };
 
+        // Generowanie kart na planszy
         const grid = document.getElementById('character-grid');
         grid.innerHTML = '';
-
         selected.forEach(char => {
             const card = document.createElement('div');
-            card.className = 'card'; 
-
-            let cExtIdx = 0;
-            const bUrl = bingFallback(char.n);
-
+            card.className = 'card';
+            let cIdx = 0;
             card.innerHTML = `
                 <div class="card-img-container">
-                    <img class="main-img" src="${getUrl(char.n, char.folder, extensions[0])}">
-                    <div class="bing-badge">BING</div>
+                    <img class="main-img" src="${getUrl(char.n, char.folder, exts[0])}">
                 </div>
                 <div class="card-name">${char.n}</div>
             `;
-
             const img = card.querySelector('.main-img');
             img.onerror = function() {
-                if (++cExtIdx < extensions.length) this.src = getUrl(char.n, char.folder, extensions[cExtIdx]);
-                else { this.src = bUrl; card.querySelector('.bing-badge').style.display = "block"; }
+                if (++cIdx < exts.length) this.src = getUrl(char.n, char.folder, exts[cIdx]);
+                else this.src = bingFallback(char.n);
             };
-
             card.onclick = () => card.classList.toggle('eliminated');
             grid.appendChild(card);
         });
@@ -643,8 +500,15 @@ let currentBoardSize = 28;
     }
 
     function copyRoomLink() {
-        navigator.clipboard.writeText(window.location.href).then(() => alert("Link skopiowany!"));
+        navigator.clipboard.writeText(window.location.href).then(() => alert("Skopiowano link do pokoju!"));
     }
+
+    // AUTO-START PO WKLEJENIU LINKU
+    window.onload = function() {
+        const params = new URLSearchParams(window.location.search);
+        const room = params.get('room');
+        if (room) enterLobby(room);
+    };
 </script>
 </body>
 </html>
