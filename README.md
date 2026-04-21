@@ -1,4 +1,4 @@
-# [Minifig Who](https://k47alizator.github.io/Minifig-Who/)
+# [Minifig Who](https://minifig-who.vercel.app/)
 
 **Minifig Who** to darmowa, fanowska gra przeglądarkowa wzorowana na klasycznym tytule "Zgadnij kto to?", osadzona w świecie najpopularniejszych klocków na świecie. Graj ze znajomymi online, wybieraj ulubione uniwersa i eliminuj postacie, by odgadnąć minifigurkę przeciwnika!
 
