@@ -200,19 +200,20 @@
             border-radius: 12px;
             font-size: 13px;
             letter-spacing: 1px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 213, 0, 0.4);
             box-shadow: 
                 0 4px 15px rgba(0, 0, 0, 0.3),
+                0 0 10px rgba(255, 213, 0, 0.15),
                 inset 0 0 10px rgba(255, 255, 255, 0.05);
         }
 
         .exit-btn:hover {
             background: rgba(255, 255, 255, 0.15);
-            border-color: var(--lego-yellow);
+            border-color: rgba(227, 0, 11, 0.7);
             transform: translateY(-3px) scale(1.05);
             box-shadow: 
                 0 8px 25px rgba(0, 0, 0, 0.4),
-                0 0 15px rgba(213, 0, 0.3), 
+                0 0 20px rgba(227, 0, 11, 0.4), 
                 inset 0 0 15px rgba(255, 255, 255, 0.1);
         }
 
@@ -297,31 +298,41 @@
             transform: scale(0.92);
         }
 
-        .card-img-container {
-            width: 100%;
-            height: 160px;
-            background: #f3f4f6;
-            border-radius: 10px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
+.card-img-container {
+    width: 100%;
+    height: 180px; 
+    background: transparent;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
 
-        .main-img { max-width: 90%; max-height: 90%; object-fit: contain; }
+.main-img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: contain; 
+    transition: transform 0.3s ease;
+}
 
-        .card-name {
-            color: #111;
-            font-size: 11px;
-            font-weight: 700;
-            margin-top: 10px; 
-            text-transform: uppercase;
-            white-space: normal; 
-            overflow: visible;
-            text-align: center;
-            line-height: 1.2;
-        }
+.card:hover .main-img {
+    transform: scale(1.08);
+}
+
+       .card-name {
+    color: #111;
+    font-size: 13px; 
+    font-weight: 700;
+    margin-top: 10px; 
+    text-transform: uppercase;
+    white-space: normal; 
+    overflow: visible;
+    text-align: center;
+    line-height: 1.2;
+    padding: 0 5px;
+}
 
         .bing-badge {
             position: absolute;
@@ -334,16 +345,53 @@
             border-radius: 4px;
             display: none;
         }
-
         .target-box {
             background: var(--card-bg);
             padding: 15px 30px;
             border-radius: 20px;
             border: 3px solid var(--lego-yellow);
-            display: inline-block;
-            margin-bottom: 30px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto 30px auto;
             backdrop-filter: blur(10px);
+            box-sizing: border-box;
         }
+
+        @media (max-width: 600px) {
+            .target-box {
+                flex-direction: column;
+                text-align: center;
+            }
+            .target-box > div {
+                text-align: center !important;
+            }
+        }
+        
+.target-img-frame {
+    width: 100px;
+    height: 100px;
+    background: white;
+    border: 3px solid var(--lego-red);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 0 15px rgba(227, 0, 11, 0.3);
+}
+
+.target-img-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 5px;
+}
 
         .share-icon-btn {
             width: 26px;
@@ -479,12 +527,18 @@
     <div class="game-logo" onclick="window.location.href = window.location.pathname;" title="Powrót do menu start">M<span>W</span></div>
 
     <div class="target-box">
-        <p style="margin: 0; color: #9CA3AF; font-size: 12px; text-transform: uppercase;">Twoja Postać:</p>
-        <h2 id="target-name" style="margin: 5px 0; color: var(--lego-yellow); font-size: 24px;">---</h2>
-    </div>
-    
-    <div style="margin-bottom: 20px;">
-        <button onclick="backToLobby()" class="exit-btn">Powrót do kategorii</button>
+        <div style="text-align: left; flex: 1;">
+            <p style="margin: 0; color: #9CA3AF; font-size: 12px; text-transform: uppercase;">Twoja Postać:</p>
+            <h2 id="target-name" style="margin: 5px 0; color: var(--lego-yellow); font-size: 24px;">---</h2>
+        </div>
+        
+        <div class="target-img-frame">
+            <img id="target-img" src="" alt="Postać">
+        </div>
+        
+        <div style="flex: 1; text-align: right;">
+            <button onclick="backToLobby()" class="exit-btn">Powrót do kategorii</button>
+        </div>
     </div>
     
     <div id="character-grid" class="character-grid"></div>
@@ -500,7 +554,8 @@
         repo: "Minifig-Who",
         folder: "img"
     };
-    // --- BAZA DANYCH POSTACI ---
+
+    // --- BAZA DANYCH POSTACI (TUTAJ WKLEJ SWOJĄ PEŁNĄ BAZĘ) ---
     const db = {
         "LEGO STAR WARS": [
             {n:"Luke Skywalker (z Tatooine)"}, {n:"Luke Skywalker (Pilot X-Wing)"}, {n:"Luke Skywalker (z Bespin)"}, {n:"Luke Skywalker (z Dagobah)"}, {n:"Luke Skywalker (Rycerz Jedi)"}, {n:"Luke Skywalker (z Endor)"}, {n:"Luke Skywalker (Szturmowiec)"}, {n:"Luke Skywalker (z Hoth)"}, {n:"Luke Skywalker (Ceremonia)"}, {n:"Luke Skywalker (Stary Luke)"}, {n:"Luke Skywalker (z Crait)"}, {n:"Luke Skywalker (Zbiornik Bacta)"}, {n:"Luke Skywalker (Pilot Śmigacza)"},
@@ -651,7 +706,7 @@
             {n:"Chudy (Toy Story)"}, {n:"Zygzak McQueen (Auta)"}, {n:"Merida Waleczna"}, {n:"Miguel (Coco)"}, {n:"Sulley (Potwory i Spółka)"}
         ]
   };
-let currentBoardSize = 21;
+ let currentBoardSize = 28;
 
     const getFolderName = (catName) => {
         return catName.replace('LEGO ', '').toLowerCase().trim().replace(/\s+\/\s+/g, '-').replace(/\s+/g, '-');
@@ -759,6 +814,22 @@ let currentBoardSize = 21;
 
         const target = selected[Math.floor(Math.random() * selected.length)];
         document.getElementById('target-name').innerText = target.n;
+        
+        const targetImgEl = document.getElementById('target-img');
+        const targetExtensions = ['jpg', 'png', 'webp', 'jpeg'];
+        let targetExtIdx = 0;
+
+        const getTargetGithubUrl = (ext) => `https://raw.githubusercontent.com/${githubConfig.user}/${githubConfig.repo}/main/${githubConfig.folder}/${target.folder}/${encodeURIComponent(target.n)}.${ext}`;
+        const targetBingUrl = `https://tse2.mm.bing.net/th?q=lego+${encodeURIComponent(target.n.replace(/\(.*\)/, ''))}+minifigure&w=200&h=300&c=7`;
+
+        targetImgEl.src = getTargetGithubUrl(targetExtensions[0]);
+        targetImgEl.onerror = function() {
+            if (++targetExtIdx < targetExtensions.length) {
+                this.src = getTargetGithubUrl(targetExtensions[targetExtIdx]);
+            } else if (this.src !== targetBingUrl) {
+                this.src = targetBingUrl;
+            }
+        };
 
         const grid = document.getElementById('character-grid');
         grid.innerHTML = '';
